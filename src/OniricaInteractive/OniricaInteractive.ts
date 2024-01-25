@@ -12,14 +12,14 @@ export class OniricaInteractive implements Experience {
     private mesh: THREE.InstancedMesh | undefined;
     private selectedId: number = -1
 
-    baseColor = new THREE.Color();
-
+    public baseColor = new THREE.Color();
+    public highlightColor = new THREE.Color(0xe28743)
     resources: Resource[] = [
     ]
 
     constructor(private engine: Engine) {
         this.parseCSV().finally(() => {
-            this.createMesh()
+            this.createScene()
         })
     }
 
@@ -29,12 +29,9 @@ export class OniricaInteractive implements Experience {
                 const instanceId = intersections[0].instanceId ? intersections[0].instanceId : 0
                 if (instanceId != this.selectedId) {
                     this.mesh!.setColorAt(this.selectedId, this.baseColor.setHex(0xffffff));
-                    this.mesh!.setColorAt(instanceId, this.baseColor.setHex(Math.random() * 0xffffff));
+                    this.mesh!.setColorAt(instanceId, this.highlightColor);
                     this.textUI.updateReportText(this.dreams.at(instanceId)!.dreamReport)
                     this.mesh!.instanceColor!.needsUpdate = true
-
-                    console.log(instanceId, this.selectedId)
-
                     this.selectedId = instanceId;
 
                 }
@@ -55,7 +52,7 @@ export class OniricaInteractive implements Experience {
         try {
             const response = await fetch('/dreams.csv');
             const csvData = await response.text();
-            const scale = 0.001;
+            const scale = 1;
             Papa.parse(csvData, {
                 header: true,
                 skipEmptyLines: true,
@@ -70,6 +67,8 @@ export class OniricaInteractive implements Experience {
                         const dream = new Dream(id, x, y, z, dreamReport);
                         this.dreams.push(dream);
                     })
+                    console.log(this.dreams);
+
                 },
             });
         } catch (error: any) {
@@ -77,20 +76,27 @@ export class OniricaInteractive implements Experience {
         }
     }
 
-    createMesh() {
+    createScene() {
         const geometry = new THREE.IcosahedronGeometry(0.01, 1);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
         this.mesh = new THREE.InstancedMesh(geometry, material, this.dreams.length);
-
         const matrix = new THREE.Matrix4();
         for (let i = 0; i < this.dreams.length; i++) {
             matrix.setPosition(this.dreams[i].position);
             this.mesh.setMatrixAt(i, matrix);
             this.mesh.setColorAt(i, this.baseColor);
-
         }
-
         this.engine.scene.add(this.mesh);
+        //add axes
+        const axesHelper = new THREE.AxesHelper( 6 );
+        axesHelper.setColors(this.highlightColor, this.highlightColor, this.highlightColor)
+        this.engine.scene.add( axesHelper );
+
+        //lights
+        const light = new THREE.AmbientLight( 0xffffff, 1 ); // soft white light
+        this.engine.scene.add( light );
+
+
     }
 
 

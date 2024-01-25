@@ -28,10 +28,7 @@ export class TextUI {
             : ``
         }
         <textarea class="scrollable-text" disabled="true"></textarea>
-        <div class="input-prompt">
-          <label for="userInput">Input:</label>
-          <input type="text" id="userInput" name="userInput">
-        </div>      `
+   `
     );
     document.body.prepend(this.container);
   }

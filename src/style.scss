@@ -12,3 +12,10 @@ body,
 #canvas {
   outline: none;
 }
+
+@font-face {
+  font-family: 'MartianMono';
+  src: url('/assets/fonts/MartianMono-Regular.woff');
+  font-weight: normal;
+  font-style: normal;
+}
