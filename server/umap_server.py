@@ -3,12 +3,10 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sentence_transformers import SentenceTransformer
 from umap.parametric_umap import load_ParametricUMAP
-from flask_cors import CORS
 
 class UMAPProjector:
     def __init__(self):
         self.app = Flask(__name__)
-        CORS(self.app, supports_credentials=True, methods=['GET', 'HEAD', 'POST', 'OPTIONS'])
         self.app.route('/project/<input_string>', methods=['GET'])(self.project_umap)
         self.app.route('/')(self.homepage)
 
