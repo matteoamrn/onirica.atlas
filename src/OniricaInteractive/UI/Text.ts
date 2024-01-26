@@ -28,7 +28,11 @@ export class TextUI {
             : ``
         }
         <textarea class="scrollable-text" disabled="true"></textarea>
-   `
+        <div class="input-prompt">
+          <label for="userInput">Search dreams containing:</label>
+          <input type="text" id="userInput" name="userInput">
+          <button id="button-search"> Search </button>
+        </div>      `
     );
     document.body.prepend(this.container);
   }

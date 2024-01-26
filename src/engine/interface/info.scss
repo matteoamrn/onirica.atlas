@@ -1,12 +1,12 @@
 .info-container {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 5px;
+  right: 5px;
   padding: 16px 20px;
 
   display: flex;
   flex-direction: column;
-
+  border-radius: 19px;
   user-select: none;
   opacity: 40%;
   transition: opacity 0.3s ease-in-out;
@@ -41,12 +41,10 @@
     display: flex;
     width: 24px;
     height: 24px;
-    padding: 8px;
     margin-right: 8px;
     border-radius: 50px;
     align-items: center;
 
-    background: #fff;
     transition: box-shadow 0.3s ease-in-out;
 
     &:hover {

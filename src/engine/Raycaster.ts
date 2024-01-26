@@ -5,6 +5,7 @@ import { Engine } from './Engine'
 export class Raycaster extends EventEmitter {
   private raycaster: THREE.Raycaster
   private pointer: THREE.Vector2
+  private intersectionObjects: THREE.Object3D[] = [];
 
   constructor(private engine: Engine) {
     super()
@@ -35,13 +36,17 @@ export class Raycaster extends EventEmitter {
     this.raycaster.setFromCamera(this.pointer, this.engine.camera.instance)
   }
 
+  public setIntersectionObjects(objects: THREE.Object3D[]) {
+    this.intersectionObjects = objects;
+  }
+
   public setPointer(x: number, y: number) {
     this.pointer.x = x
     this.pointer.y = y
   }
 
   public getIntersections() {
-    return this.raycaster.intersectObjects(this.engine.scene.children, true)
+    return this.raycaster.intersectObjects(this.intersectionObjects, true)
   }
 
   private mouseEventToVector2(event: MouseEvent) {
