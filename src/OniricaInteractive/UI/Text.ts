@@ -8,6 +8,7 @@ export type TextConfig = {
 
 export class TextUI {
   private container!: HTMLDivElement;
+  private nDreams:number = 0;
 
   constructor(config: TextConfig = {}) {
     if (config.documentTitle) {
@@ -27,12 +28,17 @@ export class TextUI {
              </div>`
             : ``
         }
-        <textarea class="scrollable-text" disabled="true"></textarea>
+        
         <div class="input-prompt">
-          <label for="userInput">Search dreams containing:</label>
-          <input type="text" id="userInput" name="userInput">
-          <button id="button-search"> Search </button>
-        </div>      `
+          <label for="userInput">Search dreams containing the word:</label>
+          <input type="text" id="userInput" name="userInput"> </input> 
+          <button id="button-search">search</button>
+        </div>
+        <div class="separatorUp"></div> 
+          <div id="dreamCount">${this.nDreams} </div>
+          <div class="separatorDown"></div>   
+        <textarea class="scrollable-text" disabled="true"> </textarea>`
+        
     );
     document.body.prepend(this.container);
   }
@@ -40,8 +46,32 @@ export class TextUI {
   updateReportText(newText: string) {
     const reportTextElement = this.container.querySelector('.scrollable-text') as HTMLTextAreaElement;
     if (reportTextElement) {
-      reportTextElement.value = newText;
+      reportTextElement.value = 'Dream' + '\n' + '\n' + '(' + '\n' + newText + '\n' + ')';
     }
   }
+  
+  updateDreamCounter(ndreams: string) {
+    const text = this.container.querySelector('#dreamCount');
+    const userInput = document.getElementById('userInput') as HTMLInputElement;
+
+    // Split the text into words and get the last word
+    const lastWord = userInput.value;
+
+    // Set the content and data-last-word attribute
+    text!.textContent = ndreams + ' dreams are talking about ';
+    text!.setAttribute('data-last-word', lastWord);
+  }
+
+  // updateSearchedWord() {
+  //   const text = this.container.querySelector('#dreamCount');
+  //   const field = document.getElementById('userInput') as HTMLInputElement;
+
+  //   text!.textContent = field.value; 
+  // }
+
+
+  
+
+
 
 }

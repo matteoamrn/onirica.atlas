@@ -14,7 +14,21 @@ body,
 }
 
 @font-face {
-  font-family: 'MartianMono';
+  font-family: 'MartianMonoLight';
+  src: url('/assets/fonts/MartianMono-Light.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MartianMonoBold';
+  src: url('/assets/fonts/MartianMono-Bold.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MartianMonoThin';
   src: url('/assets/fonts/MartianMono-Thin.ttf');
   font-weight: normal;
   font-style: normal;

@@ -22,7 +22,7 @@ export class OniricaInteractive implements Experience {
     private tree: kdTree<THREE.Vector3> | undefined
 
     public baseColor = new THREE.Color();
-    public highlightColor = new THREE.Color(0xf57614)
+    public highlightColor = new THREE.Color(0xf0e185)
     resources: Resource[] = [
     ]
 
@@ -72,18 +72,12 @@ export class OniricaInteractive implements Experience {
         })
 
         search.addEventListener('click', () => {
-            const inputValue = field.value;
-            this.highlightedIds = this.search(inputValue, this.dreams)
-            if (this.highlightedIds) {
-                for (let i = 0; i < this.dreams.length; i++) {
-                    if (this.highlightedIds.includes(i))
-                        this.mesh!.setColorAt(i, this.highlightColor);
-                    else this.mesh!.setColorAt(i, this.baseColor);
-                }
-                this.mesh!.instanceColor!.needsUpdate = true
+            let found =  this.search(field.value, this.dreams)
+            //console.log(found);
 
-            }
-
+            this.textUI.updateDreamCounter(found.length.toString())
+            
+            
             // this.projectUmap(inputValue).then((result: any) => {
             //     this.highlightSphere!.position.x = parseFloat(result.x);
             //     this.highlightSphere!.position.y = parseFloat(result.y);
@@ -159,6 +153,7 @@ export class OniricaInteractive implements Experience {
 
                         const dream = new Dream(id, x, y, z, dreamReport);
                         this.dreams.push(dream);
+                    
                     })
                 },
             });
@@ -177,10 +172,11 @@ export class OniricaInteractive implements Experience {
             this.engine.scene.add(myText);
             myText.text = ""
             myText.font = "./assets/fonts/MartianMono-Regular.ttf"
-            myText.fontSize = 0.01;
+            myText.fontSize = 0.005;
             myText.color = this.highlightColor;
             myText.sync();
             this.selectedDreams[i] = myText;
+            
         }
 
         let material = new THREE.MeshStandardMaterial({
@@ -189,6 +185,14 @@ export class OniricaInteractive implements Experience {
             opacity: 0.95,
         }
         );
+
+        // const newmat = new THREE.MeshPhysicalMaterial({
+        //     //metalness: 0,
+        //     roughness: 0.7,
+        //     transmission: 1,
+        //     thickness: 1
+        // });
+
         this.mesh = new THREE.InstancedMesh(geometry, material, this.dreams.length);
         const matrix = new THREE.Matrix4();
         for (let i = 0; i < this.dreams.length; i++) {
@@ -211,15 +215,17 @@ export class OniricaInteractive implements Experience {
         this.engine.scene.add(directionalLight, directionalLight2);
 
         //sphere
-        const sphereMat = new THREE.MeshBasicMaterial({
-            color: this.highlightColor,
-            transparent: true,
-            opacity: 0.5,
-        });
-        const geo = new THREE.SphereGeometry(0.25, 32, 32);
-        this.highlightSphere = new THREE.Mesh(geo, sphereMat);
-        this.highlightSphere.translateX(10000);
-        this.engine.scene.add(this.highlightSphere)
+        // const sphereMat = new THREE.MeshBasicMaterial({
+        //     color: this.highlightColor,
+        //     transparent: true,
+        //     opacity: 0.5,
+        // });
+        
+  
+        // const geo = new THREE.SphereGeometry(0.25, 32, 32);
+        // this.highlightSphere = new THREE.Mesh(geo, sphereMat);
+        // this.highlightSphere.translateX(10000);
+        // this.engine.scene.add(this.highlightSphere)
 
     }
 
@@ -228,6 +234,8 @@ export class OniricaInteractive implements Experience {
         dreams.forEach((dream, index) => {
             if (dream.dreamReport.includes(" " + word + " ")) {
                 indices.push(index);
+                //console.log(word);
+                //this.textUI.updateSearchedWord()
             }
         });
         return indices;
