@@ -13,16 +13,21 @@ export class OniricaInteractive implements Experience {
     private textUI: TextUI = new TextUI();
     private dreams: Dream[] = [];
     private mesh: THREE.InstancedMesh | undefined;
+    private cameraPos: THREE.Vector3 | undefined;
     private cameraDir: THREE.Vector3 = new THREE.Vector3();
     private selectedDreams: Text[] = [];
 
-    private selectedId: number = -1
-    private highlightedIds: number[] = []
+    private selectedId: number = -1 // the one user clicked on
+    private highlightedIds: number[] = [] // the ones close to the camera forward position
+    private queriedIds: number[] = []  // the ones that contain the word from user input
+
     private highlightSphere: THREE.Mesh | undefined
     private tree: kdTree<THREE.Vector3> | undefined
 
     public baseColor = new THREE.Color();
-    public highlightColor = new THREE.Color(0xf0e185)
+    public queryColor = new THREE.Color(0xe3ac2b)
+    public selectColor = new THREE.Color(0xe3592b)
+
     resources: Resource[] = [
     ]
 
@@ -30,15 +35,11 @@ export class OniricaInteractive implements Experience {
     constructor(private engine: Engine) {
         this.parseCSV().finally(() => {
             this.createScene()
-            //now the mesh has been created, initialize kd tree
-
             var distance = function (a: THREE.Vector3, b: THREE.Vector3) {
                 var deltaX = b.x - a.x;
                 var deltaY = b.y - a.y;
                 var deltaZ = b.z - a.z;
-
                 var distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-
                 return distance;
             }
 
@@ -52,8 +53,8 @@ export class OniricaInteractive implements Experience {
                 const instanceId = intersections[0].instanceId ? intersections[0].instanceId : 0
                 if (instanceId != this.selectedId) {
                     this.mesh!.setColorAt(this.selectedId, this.baseColor.setHex(0xffffff));
-                    this.mesh!.setColorAt(instanceId, this.highlightColor);
-                    this.textUI.updateReportText(this.dreams.at(instanceId)!.dreamReport)
+                    this.mesh!.setColorAt(instanceId, this.selectColor);
+                    this.textUI.updateReportText(this.dreams.at(instanceId)!.dreamReport, instanceId.toString())
                     this.mesh!.instanceColor!.needsUpdate = true
                     this.selectedId = instanceId;
 
@@ -72,12 +73,16 @@ export class OniricaInteractive implements Experience {
         })
 
         search.addEventListener('click', () => {
-            let found =  this.search(field.value, this.dreams)
-            //console.log(found);
-
-            this.textUI.updateDreamCounter(found.length.toString())
-            
-            
+            this.queriedIds = this.search(field.value, this.dreams)
+            this.textUI.updateDreamCounter(this.queriedIds.length.toString())
+            if (this.queriedIds) {
+                for (let i = 0; i < this.dreams.length; i++) {
+                    if (this.queriedIds.includes(i) || this.highlightedIds.includes(i))
+                        this.mesh!.setColorAt(i, this.queryColor);
+                    else this.mesh!.setColorAt(i, this.baseColor);
+                }
+                this.mesh!.instanceColor!.needsUpdate = true
+            }
             // this.projectUmap(inputValue).then((result: any) => {
             //     this.highlightSphere!.position.x = parseFloat(result.x);
             //     this.highlightSphere!.position.y = parseFloat(result.y);
@@ -105,35 +110,62 @@ export class OniricaInteractive implements Experience {
 
     // called on each render
     update() {
-        this.cameraDir = this.engine.camera.instance.getWorldDirection(this.cameraDir).normalize()
-        let stepDistance = 0.5
-        let futurePos = this.engine.camera.instance.position.clone().add(this.cameraDir.clone().multiplyScalar(stepDistance));
+    //if camera pos has changed, update displayed texts
+        if (this.hasCameraPositionChanged()) {
+            this.updateCameraValues()
+            const stepDistance = 0.5
+            const futurePos = this.getFuturePosition(stepDistance)
 
-        let tmp = this.tree?.nearest(futurePos, this.nneighbors).map((p: any) => {
-            return this.dreams.map(d => d.position).indexOf(p[0])
-        })
-        if (tmp) {
-            this.highlightedIds = tmp
-            for (let i = 0; i < this.dreams.length; i++) {
-                if (this.highlightedIds.includes(i))
-                    {
-                        this.mesh!.setColorAt(i, this.highlightColor);
-                    }
-                else {
-                        this.mesh!.setColorAt(i, this.baseColor);
-                }
-            }
-            this.mesh!.instanceColor!.needsUpdate = true
-            for (let i = 0; i < this.nneighbors; i++) {
-                const currentDream:Dream = this.dreams[this.highlightedIds[i]]
-                this.selectedDreams.at(i).text = currentDream.dreamReport.substring(0, 50)
-                this.selectedDreams.at(i).position.x = currentDream.position.x
-                this.selectedDreams.at(i).position.y = currentDream.position.y + 0.02
-                this.selectedDreams.at(i).position.z = currentDream.position.z
-                this.selectedDreams.at(i).lookAt(this.engine.camera.instance.position)
+            let temp = this.getNearestDreamIndices(futurePos)
+            if (temp) {
+                this.highlightedIds = temp
+                this.updateSelectedDreams()
+                this.updateNeighboursColor()
             }
         }
     }
+
+    hasCameraPositionChanged() {
+        return this.cameraPos != this.engine.camera.instance.position.clone();
+    }
+    
+    updateCameraValues() {
+        this.cameraPos = this.engine.camera.instance.position.clone()
+        this.cameraDir = this.engine.camera.instance.getWorldDirection(this.cameraDir).normalize()
+    }
+    
+    getFuturePosition(stepDistance: number) {
+        return this.engine.camera.instance.position.clone().add(this.cameraDir.clone().multiplyScalar(stepDistance));
+    }
+    
+    getNearestDreamIndices(futurePos:THREE.Vector3) {
+        return this.tree?.nearest(futurePos, this.nneighbors)?.map((p: any) => {
+            return this.dreams.map(d => d.position).indexOf(p[0])
+        });
+    }
+    
+    updateSelectedDreams() {
+        for (let i = 0; i < this.nneighbors; i++) {
+            const currentDream: Dream = this.dreams[this.highlightedIds[i]]
+            const dreamEntry = this.selectedDreams.at(i);
+            dreamEntry.text = currentDream.dreamReport.substring(0, 50)
+            dreamEntry.position.x = currentDream.position.x
+            dreamEntry.position.y = currentDream.position.y + 0.02
+            dreamEntry.position.z = currentDream.position.z
+            dreamEntry.quaternion.copy(this.engine.camera.instance.quaternion)
+            }
+    }
+
+    updateNeighboursColor(){
+        const highlightedAndQueriedIds = [...this.highlightedIds, ...this.queriedIds];
+        this.dreams.forEach((_d: Dream, i: number) => {
+            const color = highlightedAndQueriedIds.includes(i) ? this.queryColor : this.baseColor;
+            this.mesh!.setColorAt(i, color);        
+        })
+        this.mesh!.instanceColor!.needsUpdate = true;
+
+    }
+    
 
     async parseCSV() {
         try {
@@ -153,7 +185,7 @@ export class OniricaInteractive implements Experience {
 
                         const dream = new Dream(id, x, y, z, dreamReport);
                         this.dreams.push(dream);
-                    
+
                     })
                 },
             });
@@ -164,19 +196,19 @@ export class OniricaInteractive implements Experience {
 
     createScene() {
         const geometry = new THREE.IcosahedronGeometry(0.008, 1);
-        this.selectedDreams = new Array(5).fill(null);          
-          
+        this.selectedDreams = new Array(5).fill(null);
+
         //create texts
         for (let i = 0; i < this.nneighbors; i++) {
-            const myText:Text = new Text();
+            const myText: Text = new Text();
             this.engine.scene.add(myText);
             myText.text = ""
             myText.font = "./assets/fonts/MartianMono-Regular.ttf"
             myText.fontSize = 0.005;
-            myText.color = this.highlightColor;
+            myText.color = this.queryColor;
             myText.sync();
             this.selectedDreams[i] = myText;
-            
+
         }
 
         let material = new THREE.MeshStandardMaterial({
@@ -185,14 +217,6 @@ export class OniricaInteractive implements Experience {
             opacity: 0.95,
         }
         );
-
-        // const newmat = new THREE.MeshPhysicalMaterial({
-        //     //metalness: 0,
-        //     roughness: 0.7,
-        //     transmission: 1,
-        //     thickness: 1
-        // });
-
         this.mesh = new THREE.InstancedMesh(geometry, material, this.dreams.length);
         const matrix = new THREE.Matrix4();
         for (let i = 0; i < this.dreams.length; i++) {
@@ -204,7 +228,7 @@ export class OniricaInteractive implements Experience {
         this.engine.raycaster.setIntersectionObjects([this.mesh])
         //add axes
         const axesHelper = new THREE.AxesHelper(6);
-        axesHelper.setColors(this.highlightColor, this.highlightColor, this.highlightColor)
+        axesHelper.setColors(this.queryColor, this.queryColor, this.queryColor)
         this.engine.scene.add(axesHelper);
 
         //lights
@@ -214,28 +238,13 @@ export class OniricaInteractive implements Experience {
         directionalLight2.position.set(-5, 5, -5);
         this.engine.scene.add(directionalLight, directionalLight2);
 
-        //sphere
-        // const sphereMat = new THREE.MeshBasicMaterial({
-        //     color: this.highlightColor,
-        //     transparent: true,
-        //     opacity: 0.5,
-        // });
-        
-  
-        // const geo = new THREE.SphereGeometry(0.25, 32, 32);
-        // this.highlightSphere = new THREE.Mesh(geo, sphereMat);
-        // this.highlightSphere.translateX(10000);
-        // this.engine.scene.add(this.highlightSphere)
-
     }
 
     search(word: string, dreams: Dream[]): number[] {
         const indices: number[] = [];
         dreams.forEach((dream, index) => {
-            if (dream.dreamReport.includes(" " + word + " ")) {
+            if (dream.dreamReport.includes(" " + word)) {
                 indices.push(index);
-                //console.log(word);
-                //this.textUI.updateSearchedWord()
             }
         });
         return indices;

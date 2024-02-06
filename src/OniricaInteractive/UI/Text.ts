@@ -35,7 +35,7 @@ export class TextUI {
           <button id="button-search">search</button>
         </div>
         <div class="separatorUp"></div> 
-          <div id="dreamCount">${this.nDreams} </div>
+          <div id="dreamCount"> </div>
           <div class="separatorDown"></div>   
         <textarea class="scrollable-text" disabled="true"> </textarea>`
         
@@ -43,21 +43,17 @@ export class TextUI {
     document.body.prepend(this.container);
   }
 
-  updateReportText(newText: string) {
+  updateReportText(newText: string, dreamId:string) {
     const reportTextElement = this.container.querySelector('.scrollable-text') as HTMLTextAreaElement;
     if (reportTextElement) {
-      reportTextElement.value = 'Dream' + '\n' + '\n' + '(' + '\n' + newText + '\n' + ')';
+      reportTextElement.value = 'Dream #' + dreamId + '\n' + '\n' + '(' + '\n' + newText + '\n' + ')';
     }
   }
   
   updateDreamCounter(ndreams: string) {
     const text = this.container.querySelector('#dreamCount');
     const userInput = document.getElementById('userInput') as HTMLInputElement;
-
-    // Split the text into words and get the last word
     const lastWord = userInput.value;
-
-    // Set the content and data-last-word attribute
     text!.textContent = ndreams + ' dreams are talking about ';
     text!.setAttribute('data-last-word', lastWord);
   }
