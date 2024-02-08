@@ -114,7 +114,7 @@ export class OniricaInteractive implements Experience {
     //if camera pos has changed, update displayed texts
         if (this.hasCameraPositionChanged()) {
             this.updateCameraValues()
-            const stepDistance = 0.5
+            const stepDistance = 0.1
             const futurePos = this.getFuturePosition(stepDistance)
 
             let temp = this.getNearestDreamIndices(futurePos)
@@ -146,21 +146,45 @@ export class OniricaInteractive implements Experience {
     }
     
     updateSelectedDreams() {
+        const cameraDir = this.engine.camera.instance.getWorldDirection(new THREE.Vector3()).normalize();
+
         for (let i = 0; i < this.nneighbors; i++) {
             const currentDream: Dream = this.dreams[this.highlightedIds[i]]
             const dreamEntry = this.selectedDreams.at(i);
             dreamEntry.text = currentDream.dreamReport.substring(0, 50)
-            dreamEntry.position.x = currentDream.position.x + 0.008
-            dreamEntry.position.y = currentDream.position.y + 0.006
-            dreamEntry.position.z = currentDream.position.z
-            dreamEntry.quaternion.copy(this.engine.camera.instance.quaternion)
+           // const camToDream = currentDream.position.clone().sub(this.engine.camera.instance.position.clone())
+
+            const distance = 0.005;
+            const distanceY = 0.002;
+            const YVector = new THREE.Vector3(0.0,1.0,0.0);
+           // const perpendicularVector = new THREE.Vector3().crossVectors(cameraDir, currentDream.position).normalize();
+            const perpendicularVector = new THREE.Vector3().crossVectors(cameraDir, YVector).normalize();
+            const perpendicularVectorY = new THREE.Vector3().crossVectors(perpendicularVector, cameraDir).normalize();
+            const newPosition = currentDream.position.clone().addScaledVector(perpendicularVector, distance).addScaledVector(perpendicularVectorY,distanceY);
+            
+            //const textWidth = dreamEntry.layout.width;
+            //dreamEntry.position.copy(newPosition).addScaledVector(cameraDir, -textWidth / 2);
+            dreamEntry.position.copy(newPosition);
+            dreamEntry.rotation.setFromRotationMatrix(this.engine.camera.instance.matrixWorld);
+    
+            dreamEntry.sync();
+            //console.log(newPosition);
+            //console.log(dreamEntry.position);
+        }
+
+            // dreamEntry.text = currentDream.dreamReport.substring(0, 50)
+            // dreamEntry.position.x = currentDream.position.x + 0.008
+            // dreamEntry.position.y = currentDream.position.y + 0.006
+            // dreamEntry.position.z = currentDream.position.z
+            
+            // dreamEntry.quaternion.copy(this.engine.camera.instance.quaternion)
             // this.backgroundPlanes.at(i).position.x = currentDream.position.x 
             // this.backgroundPlanes.at(i).position.y = currentDream.position.y
             // this.backgroundPlanes.at(i).position.z = currentDream.position.z
             // this.backgroundPlanes.at(i).quaternion.copy(this.engine.camera.instance.quaternion)
 
 
-            }
+           
     }
 
     updateNeighboursColor(){
@@ -202,13 +226,14 @@ export class OniricaInteractive implements Experience {
     }
 
     createScene() {
-        const geometry = new THREE.IcosahedronGeometry(0.008, 3);
+        const geometry = new THREE.IcosahedronGeometry(0.004, 3);
         this.selectedDreams = new Array(5).fill(null);
 
         //create texts
         for (let i = 0; i < this.nneighbors; i++) {
             const myText: Text = new Text();
             this.engine.scene.add(myText);
+            //myText.anchorX = '1000%';
             myText.text = ""
             myText.font = "./assets/fonts/MartianMono-Regular.ttf"
             myText.fontSize = 0.003;
