@@ -37,7 +37,13 @@ export class TextUI {
         <div class="separatorUp"></div> 
           <div id="dreamCount"> </div>
         <div class="separatorDown"></div>   
-        <textarea class="scrollable-text" disabled="true"> </textarea>`
+        <textarea class="scrollable-text" disabled="true"> </textarea>
+        <div id="topics"> Explore other dreams about: </div>
+        <div class="button-container">
+          <button id="button-topic1" class="button-topic">Hamsters</button>
+          <button id="button-topic2" class="button-topic">Cake</button>
+          <button id="button-topic3" class="button-topic">Sleep</button>
+        </div>`
         
     );
     document.body.prepend(this.container);
@@ -57,6 +63,11 @@ export class TextUI {
     text!.textContent = ndreams + ' dreams are talking about ';
     text!.setAttribute('data-last-word', lastWord);
   }
+
+  // updateRelatedTopics(topics: string){
+
+
+  // }
 
   // updateSearchedWord() {
   //   const text = this.container.querySelector('#dreamCount');

@@ -247,6 +247,7 @@ export class OniricaInteractive implements Experience {
             myText.font = "./assets/fonts/MartianMono-Regular.ttf"
             myText.fontSize = 0.003;
             myText.color = this.queryColor;
+            myText.maxWidth = 0.15
             myText.sync();
             this.dreamTexts[i] = myText;
             // const planeGeometry = new THREE.PlaneGeometry(0.1, 0.01);
