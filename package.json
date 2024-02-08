@@ -16,6 +16,7 @@
   },
   "type": "module",
   "dependencies": {
+    "gsap": "^3.12.5",
     "kd-tree-javascript": "^1.0.3",
     "lil-gui": "^0.18.2",
     "papaparse": "^5.4.1",

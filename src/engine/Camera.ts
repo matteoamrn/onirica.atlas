@@ -2,6 +2,7 @@ import { Engine } from './Engine'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GameEntity } from './GameEntity'
+import gsap from 'gsap'
 
 export class Camera implements GameEntity {
   public instance!: THREE.PerspectiveCamera
@@ -40,6 +41,14 @@ export class Camera implements GameEntity {
     this.instance.aspect = this.engine.sizes.aspectRatio
     this.instance.updateProjectionMatrix()
   }
+
+  animateTo(target_position:THREE.Vector3) {
+    const new_camera_dir = this.instance.position.clone().sub(target_position).normalize().multiplyScalar(0.4)
+    const pos = target_position.clone().add(new_camera_dir)
+    gsap.to(this.instance.position, {x: pos.x, y:pos.y, z:pos.z, duration: 1.5});
+    gsap.to(this.controls.target, {x: target_position.x, y:target_position.y, z: target_position.z, duration: 1.5})
+}
+
 
   update() {
     this.controls.update()

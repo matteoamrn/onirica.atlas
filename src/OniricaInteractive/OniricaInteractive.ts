@@ -17,6 +17,7 @@ function distance (a: THREE.Vector3, b: THREE.Vector3) {
 }
 
 export class OniricaInteractive implements Experience {
+    private cameraForwardDistance:number = 0.5
     private nneighbors: number = 15;
     private textUI: TextUI = new TextUI();
     private dreams: Dream[] = [];
@@ -59,8 +60,8 @@ export class OniricaInteractive implements Experience {
                     this.textUI.updateReportText(this.dreams.at(instanceId)!.dreamReport, instanceId.toString())
                     this.mesh!.instanceColor!.needsUpdate = true
                     this.selectedId = instanceId;
-
                 }
+                this.engine.camera.animateTo(this.dreams.at(instanceId)!.position)
             }
         });
 
@@ -85,7 +86,7 @@ export class OniricaInteractive implements Experience {
                 }
                 this.mesh!.instanceColor!.needsUpdate = true
             }
-            this.updateNearest(0.7);
+            this.updateNearest(this.cameraForwardDistance);
             // this.projectUmap(inputValue).then((result: any) => {
             //     this.highlightSphere!.position.x = parseFloat(result.x);
             //     this.highlightSphere!.position.y = parseFloat(result.y);
@@ -116,7 +117,7 @@ export class OniricaInteractive implements Experience {
     update() {
     //if camera pos has changed, update displayed texts
         if (this.hasCameraChanged()) {
-            this.updateNearest(0.7)
+            this.updateNearest(this.cameraForwardDistance)
         }
     }
     updateNearest(stepDistance: number) {
