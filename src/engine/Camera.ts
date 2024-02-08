@@ -6,7 +6,9 @@ import { GameEntity } from './GameEntity'
 export class Camera implements GameEntity {
   public instance!: THREE.PerspectiveCamera
   private controls!: OrbitControls
-
+  private cameraWorldDir = new THREE.Vector3();
+  
+  
   private minBounds = new THREE.Vector3(-2, -2, -2);
   private maxBounds = new THREE.Vector3(2, 2, 2);
 
@@ -41,6 +43,10 @@ export class Camera implements GameEntity {
 
   update() {
     this.controls.update()
+    this.controls.object.getWorldDirection(this.cameraWorldDir);
+
+    if (this.controls!.getDistance() < 2.)
+      this.controls.target.add(this.cameraWorldDir.multiplyScalar(0.4));
 
     const cameraPosition = this.instance.position.clone();
     cameraPosition.clamp(this.minBounds, this.maxBounds);
