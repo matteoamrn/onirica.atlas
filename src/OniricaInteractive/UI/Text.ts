@@ -36,7 +36,7 @@ export class TextUI {
         </div>
         <div class="separatorUp"></div> 
           <div id="dreamCount"> </div>
-          <div class="separatorDown"></div>   
+        <div class="separatorDown"></div>   
         <textarea class="scrollable-text" disabled="true"> </textarea>`
         
     );
@@ -46,7 +46,7 @@ export class TextUI {
   updateReportText(newText: string, dreamId:string) {
     const reportTextElement = this.container.querySelector('.scrollable-text') as HTMLTextAreaElement;
     if (reportTextElement) {
-      reportTextElement.value = 'Dream #' + dreamId + '\n' + '\n' + '(' + '\n' + newText + '\n' + ')';
+      reportTextElement.value = 'Dream #' + dreamId + '\n' + '\n' + '\n' + '(' + '\n' + '\n' + newText + '\n' + '\n' + ')';
     }
   }
   
