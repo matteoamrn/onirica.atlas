@@ -45,8 +45,8 @@ export class Camera implements GameEntity {
     this.controls.update()
     this.controls.object.getWorldDirection(this.cameraWorldDir);
 
-    if (this.controls!.getDistance() < 2.)
-      this.controls.target.add(this.cameraWorldDir.multiplyScalar(0.4));
+    if (this.controls!.getDistance() < 0.2)
+      this.controls.target.add(this.cameraWorldDir.multiplyScalar(0.2));
 
     const cameraPosition = this.instance.position.clone();
     cameraPosition.clamp(this.minBounds, this.maxBounds);
