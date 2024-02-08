@@ -163,8 +163,7 @@ export class OniricaInteractive implements Experience {
         for (let i = 0; i < this.nneighbors; i++) {
             const currentDream: Dream = this.dreams[this.highlightedIds[i]]
             const dreamEntry = this.dreamTexts.at(i);
-            dreamEntry.text = currentDream.dreamReport.substring(0, 50)
-           // const camToDream = currentDream.position.clone().sub(this.engine.camera.instance.position.clone())
+            dreamEntry.text =this.selectDreamContext(currentDream.dreamReport, this.queryString, 15)
 
             const distance = 0.005;
             const distanceY = 0.002;
@@ -173,29 +172,11 @@ export class OniricaInteractive implements Experience {
             const perpendicularVector = new THREE.Vector3().crossVectors(cameraDir, YVector).normalize();
             const perpendicularVectorY = new THREE.Vector3().crossVectors(perpendicularVector, cameraDir).normalize();
             const newPosition = currentDream.position.clone().addScaledVector(perpendicularVector, distance).addScaledVector(perpendicularVectorY,distanceY);
-            
-            //const textWidth = dreamEntry.layout.width;
-            //dreamEntry.position.copy(newPosition).addScaledVector(cameraDir, -textWidth / 2);
             dreamEntry.position.copy(newPosition);
             dreamEntry.rotation.setFromRotationMatrix(this.engine.camera.instance.matrixWorld);
-    
+
             dreamEntry.sync();
-            //console.log(newPosition);
-            //console.log(dreamEntry.position);
         }
-
-            // dreamEntry.text = currentDream.dreamReport.substring(0, 50)
-            // dreamEntry.position.x = currentDream.position.x + 0.008
-            // dreamEntry.position.y = currentDream.position.y + 0.006
-            // dreamEntry.position.z = currentDream.position.z
-            
-            // dreamEntry.quaternion.copy(this.engine.camera.instance.quaternion)
-            // this.backgroundPlanes.at(i).position.x = currentDream.position.x 
-            // this.backgroundPlanes.at(i).position.y = currentDream.position.y
-            // this.backgroundPlanes.at(i).position.z = currentDream.position.z
-            // this.backgroundPlanes.at(i).quaternion.copy(this.engine.camera.instance.quaternion)
-
-
            
     }
 
