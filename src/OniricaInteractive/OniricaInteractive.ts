@@ -9,13 +9,14 @@ import { Text } from 'troika-three-text'
 import { kdTree } from 'kd-tree-javascript'
 
 export class OniricaInteractive implements Experience {
-    private nneighbors: number = 10
+    private nneighbors: number = 40;
     private textUI: TextUI = new TextUI();
     private dreams: Dream[] = [];
     private mesh: THREE.InstancedMesh | undefined;
     private cameraPos: THREE.Vector3 | undefined;
     private cameraDir: THREE.Vector3 = new THREE.Vector3();
     private selectedDreams: Text[] = [];
+    private backgroundPlanes: any = [];
 
     private selectedId: number = -1 // the one user clicked on
     private highlightedIds: number[] = [] // the ones close to the camera forward position
@@ -25,7 +26,7 @@ export class OniricaInteractive implements Experience {
     private tree: kdTree<THREE.Vector3> | undefined
 
     public baseColor = new THREE.Color();
-    public queryColor = new THREE.Color(0xe3ac2b)
+    public queryColor = new THREE.Color(0xf8dd5a)
     public selectColor = new THREE.Color(0xe3592b)
 
     resources: Resource[] = [
@@ -149,10 +150,16 @@ export class OniricaInteractive implements Experience {
             const currentDream: Dream = this.dreams[this.highlightedIds[i]]
             const dreamEntry = this.selectedDreams.at(i);
             dreamEntry.text = currentDream.dreamReport.substring(0, 50)
-            dreamEntry.position.x = currentDream.position.x
-            dreamEntry.position.y = currentDream.position.y + 0.02
+            dreamEntry.position.x = currentDream.position.x + 0.008
+            dreamEntry.position.y = currentDream.position.y + 0.006
             dreamEntry.position.z = currentDream.position.z
             dreamEntry.quaternion.copy(this.engine.camera.instance.quaternion)
+            // this.backgroundPlanes.at(i).position.x = currentDream.position.x 
+            // this.backgroundPlanes.at(i).position.y = currentDream.position.y
+            // this.backgroundPlanes.at(i).position.z = currentDream.position.z
+            // this.backgroundPlanes.at(i).quaternion.copy(this.engine.camera.instance.quaternion)
+
+
             }
     }
 
@@ -195,7 +202,7 @@ export class OniricaInteractive implements Experience {
     }
 
     createScene() {
-        const geometry = new THREE.IcosahedronGeometry(0.008, 1);
+        const geometry = new THREE.IcosahedronGeometry(0.008, 3);
         this.selectedDreams = new Array(5).fill(null);
 
         //create texts
@@ -204,19 +211,25 @@ export class OniricaInteractive implements Experience {
             this.engine.scene.add(myText);
             myText.text = ""
             myText.font = "./assets/fonts/MartianMono-Regular.ttf"
-            myText.fontSize = 0.005;
+            myText.fontSize = 0.003;
             myText.color = this.queryColor;
             myText.sync();
             this.selectedDreams[i] = myText;
-
+            // const planeGeometry = new THREE.PlaneGeometry(0.1, 0.01);
+            // const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
+            // const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            // this.backgroundPlanes.push(plane);
+            // this.engine.scene.add(plane);
         }
+        
 
-        let material = new THREE.MeshStandardMaterial({
-            color: 0xbebeb6,
-            transparent: true,
-            opacity: 0.95,
-        }
-        );
+        let material = new THREE.MeshMatcapMaterial({
+            color: 0xbebebd,
+           //matcap: // Specify your matcap texture here,
+            transparent: false,
+            //opacity: 0.95,
+          });
+
         this.mesh = new THREE.InstancedMesh(geometry, material, this.dreams.length);
         const matrix = new THREE.Matrix4();
         for (let i = 0; i < this.dreams.length; i++) {
@@ -231,12 +244,12 @@ export class OniricaInteractive implements Experience {
         axesHelper.setColors(this.queryColor, this.queryColor, this.queryColor)
         this.engine.scene.add(axesHelper);
 
-        //lights
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(5, 5, 5);
-        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight2.position.set(-5, 5, -5);
-        this.engine.scene.add(directionalLight, directionalLight2);
+        // //lights
+        // const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        // directionalLight.position.set(5, 5, 5);
+        // const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
+        // directionalLight2.position.set(-5, 5, -5);
+        // this.engine.scene.add(directionalLight, directionalLight2);
 
     }
 

@@ -174,15 +174,15 @@ __metadata:
   linkType: hard
 
 "@npmcli/agent@npm:^2.0.0":
-  version: 2.2.0
-  resolution: "@npmcli/agent@npm:2.2.0"
+  version: 2.2.1
+  resolution: "@npmcli/agent@npm:2.2.1"
   dependencies:
     agent-base: ^7.1.0
     http-proxy-agent: ^7.0.0
     https-proxy-agent: ^7.0.1
     lru-cache: ^10.0.1
     socks-proxy-agent: ^8.0.1
-  checksum: 3b25312edbdfaa4089af28e2d423b6f19838b945e47765b0c8174c1395c79d43c3ad6d23cb364b43f59fd3acb02c93e3b493f72ddbe3dfea04c86843a7311fc4
+  checksum: c69aca42dbba393f517bc5777ee872d38dc98ea0e5e93c1f6d62b82b8fecdc177a57ea045f07dda1a770c592384b2dd92a5e79e21e2a7cf51c9159466a8f9c9b
   languageName: node
   linkType: hard
 
@@ -1361,6 +1361,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"postprocessing@npm:^6.34.2":
+  version: 6.34.2
+  resolution: "postprocessing@npm:6.34.2"
+  peerDependencies:
+    three: ">= 0.138.0 < 0.162.0"
+  checksum: 023d26c588bb4714ca017829f4dc02510c366ea5b0d2e72454d0e64be36cbc506536c54ea5abc615f117bac89857e120afc88e0a4a7f64c4bb4511b05e7ecc45
+  languageName: node
+  linkType: hard
+
 "prettier@npm:2.8.8":
   version: 2.8.8
   resolution: "prettier@npm:2.8.8"
@@ -1462,13 +1471,13 @@ __metadata:
   linkType: hard
 
 "semver@npm:^7.3.5":
-  version: 7.5.4
-  resolution: "semver@npm:7.5.4"
+  version: 7.6.0
+  resolution: "semver@npm:7.6.0"
   dependencies:
     lru-cache: ^6.0.0
   bin:
     semver: bin/semver.js
-  checksum: 12d8ad952fa353b0995bf180cdac205a4068b759a140e5d3c608317098b3575ac2f1e09182206bf2eb26120e1c0ed8fb92c48c592f6099680de56bb071423ca3
+  checksum: 7427f05b70786c696640edc29fdd4bc33b2acf3bbe1740b955029044f80575fc664e1a512e4113c3af21e767154a94b4aa214bf6cd6e42a1f6dba5914e0b208c
   languageName: node
   linkType: hard
 
@@ -1643,6 +1652,7 @@ __metadata:
     lil-gui: ^0.18.2
     lint-staged: ^13.3.0
     papaparse: ^5.4.1
+    postprocessing: ^6.34.2
     prettier: 2.8.8
     sass: ^1.69.0
     three: ^0.157.0

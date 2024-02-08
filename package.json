@@ -19,6 +19,7 @@
     "kd-tree-javascript": "^1.0.3",
     "lil-gui": "^0.18.2",
     "papaparse": "^5.4.1",
+    "postprocessing": "^6.34.2",
     "three": "^0.157.0",
     "troika-three-text": "^0.49.0"
   },

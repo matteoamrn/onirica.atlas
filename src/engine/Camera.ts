@@ -7,6 +7,9 @@ export class Camera implements GameEntity {
   public instance!: THREE.PerspectiveCamera
   private controls!: OrbitControls
 
+  private minBounds = new THREE.Vector3(-2, -2, -2);
+  private maxBounds = new THREE.Vector3(2, 2, 2);
+
   constructor(private engine: Engine) {
     this.initCamera()
     this.initControls()
@@ -14,14 +17,14 @@ export class Camera implements GameEntity {
 
   private initCamera() {
     this.instance = new THREE.PerspectiveCamera(
-      75,
+      35,
       window.innerWidth / window.innerHeight,
       0.1,
       1000
     )
-    this.instance.position.z = 10
-    this.instance.position.y = 2
-    this.instance.position.x = 2
+    this.instance.position.z = 0.1
+    this.instance.position.y = 0.1
+    this.instance.position.x = 0.1
 
     this.engine.scene.add(this.instance)
   }
@@ -38,5 +41,9 @@ export class Camera implements GameEntity {
 
   update() {
     this.controls.update()
+
+    const cameraPosition = this.instance.position.clone();
+    cameraPosition.clamp(this.minBounds, this.maxBounds);
+    this.instance.position.copy(cameraPosition);
   }
 }
