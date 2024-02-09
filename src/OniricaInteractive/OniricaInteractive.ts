@@ -47,6 +47,7 @@ export class OniricaInteractive implements Experience {
             this.createScene()
 
             this.tree = new kdTree(this.dreams.map(a => a.position), distance, ["x", "y", "z"]);
+            this.updateNearest(this.cameraForwardDistance)
         })
     }
 
@@ -120,6 +121,7 @@ export class OniricaInteractive implements Experience {
             this.updateNearest(this.cameraForwardDistance)
         }
     }
+
     updateNearest(stepDistance: number) {
         const futurePos = this.getFuturePosition(stepDistance)
 
@@ -222,8 +224,9 @@ export class OniricaInteractive implements Experience {
                         const y = parseFloat(row.y) * scale;
                         const z = parseFloat(row.z) * scale;
                         const dreamReport = String(row.report);
+                        const topics = String(row.keywords)
 
-                        const dream = new Dream(id, x, y, z, dreamReport);
+                        const dream = new Dream(id, x, y, z, dreamReport, topics);
                         this.dreams.push(dream);
 
                     })
