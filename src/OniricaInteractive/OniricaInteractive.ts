@@ -57,30 +57,11 @@ export class OniricaInteractive implements Experience {
     
 
     init() {
-        const buttons = document.querySelectorAll('.button-topic');
 
         this.engine.raycaster.on('click', (intersections: THREE.Intersection[]) => {
             if (intersections.length > 0) {
                 const instanceId = intersections[0].instanceId ? intersections[0].instanceId : 0
-                if (instanceId != this.selectedId) {
-                    this.mesh!.setColorAt(this.selectedId, this.baseColor.setHex(0xffffff));
-                    this.mesh!.setColorAt(instanceId, this.selectColor);
-                    this.textUI.updateReportText(this.dreams.at(instanceId)!.dreamReport, instanceId.toString())
-                    this.mesh!.instanceColor!.needsUpdate = true
-                    this.selectedId = instanceId;
-                    
-                }
-                this.engine.camera.animateTo(this.dreams.at(instanceId)!.position)
-                this.dreamTexts.forEach((t:Text) => {
-                    gsap.to(t, {fillOpacity: 0, ease: "expo.out", duration:0.5, onComplete: () => {
-                        gsap.to(t, {fillOpacity: 1, ease: "expo.in", duration:2.})
-                    }})
-
-                });
-
-                buttons.forEach((button, id) => {
-                    button!.textContent = this.dreams.at(this.selectedId)!.topics[id];
-                    });    
+                this.onDreamSelection(instanceId)
             }
 
             
@@ -131,6 +112,8 @@ export class OniricaInteractive implements Experience {
         buttonPrevious.addEventListener('click', () => {
             this.navigateToPreviousDream();
         });
+
+        const buttons = document.querySelectorAll('.button-topic');
 
         buttons.forEach(button => {
             button.addEventListener('click', () => {
@@ -262,15 +245,7 @@ export class OniricaInteractive implements Experience {
             const currentIndex = this.queriedIds.indexOf(this.selectedId);
             const nextIndex = (currentIndex + 1) % this.queriedIds.length;
             const nextDreamId = this.queriedIds[nextIndex];
-
-            this.mesh!.setColorAt(this.selectedId, this.baseColor);
-            this.mesh!.setColorAt(nextDreamId, this.selectColor);
-            this.mesh!.instanceColor!.needsUpdate = true;
-
-            this.selectedId = nextDreamId;
-
-            this.textUI.updateReportText(this.dreams.at(nextDreamId)!.dreamReport, nextDreamId.toString());
-            this.engine.camera.animateTo(this.dreams.at(nextDreamId)!.position);
+            this.onDreamSelection(nextDreamId);
         }
     }
 
@@ -279,15 +254,7 @@ export class OniricaInteractive implements Experience {
             const currentIndex = this.queriedIds.indexOf(this.selectedId);
             const previousIndex = (currentIndex - 1 + this.queriedIds.length) % this.queriedIds.length;
             const previousDreamId = this.queriedIds[previousIndex];
-
-            this.mesh!.setColorAt(this.selectedId, this.baseColor);
-            this.mesh!.setColorAt(previousDreamId, this.selectColor);
-            this.mesh!.instanceColor!.needsUpdate = true;
-
-            this.selectedId = previousDreamId;
-
-            this.textUI.updateReportText(this.dreams.at(previousDreamId)!.dreamReport, previousDreamId.toString());
-            this.engine.camera.animateTo(this.dreams.at(previousDreamId)!.position);
+            this.onDreamSelection(previousDreamId);
         }
     }
 
@@ -379,5 +346,28 @@ export class OniricaInteractive implements Experience {
     }
 
 
+    onDreamSelection(instanceId:number) {
+        if (instanceId != this.selectedId) {
+            this.mesh!.setColorAt(this.selectedId, this.baseColor.setHex(0xffffff));
+            this.mesh!.setColorAt(instanceId, this.selectColor);
+            this.textUI.updateReportText(this.dreams.at(instanceId)!.dreamReport, instanceId.toString())
+            this.mesh!.instanceColor!.needsUpdate = true
+            this.selectedId = instanceId;
+            
+        }
+        this.engine.camera.animateTo(this.dreams.at(instanceId)!.position)
+        this.dreamTexts.forEach((t:Text) => {
+            gsap.to(t, {fillOpacity: 0, ease: "expo.out", duration:0.5, onComplete: () => {
+                gsap.to(t, {fillOpacity: 1, ease: "expo.in", duration:2.})
+            }})
+    
+        });
+        const buttons = document.querySelectorAll('.button-topic');
 
+        buttons.forEach((button, id) => {
+            button!.textContent = this.dreams.at(this.selectedId)!.topics[id];
+            });    
+    }
+    
 }
+
