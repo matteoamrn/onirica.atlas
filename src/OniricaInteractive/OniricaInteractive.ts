@@ -7,6 +7,7 @@ import Papa from 'papaparse';
 import { TextUI } from './UI/Text';
 import { Text } from 'troika-three-text'
 import { kdTree } from 'kd-tree-javascript'
+import gsap from 'gsap'
 
 function distance (a: THREE.Vector3, b: THREE.Vector3) {
     var deltaX = b.x - a.x;
@@ -17,6 +18,7 @@ function distance (a: THREE.Vector3, b: THREE.Vector3) {
 }
 
 export class OniricaInteractive implements Experience {
+    private hasCSVLoaded:boolean =  false;
     private cameraForwardDistance:number = 0.5
     private nneighbors: number = 15;
     private textUI: TextUI = new TextUI();
@@ -47,11 +49,16 @@ export class OniricaInteractive implements Experience {
             this.createScene()
 
             this.tree = new kdTree(this.dreams.map(a => a.position), distance, ["x", "y", "z"]);
+            this.hasCSVLoaded =  true
             this.updateNearest(this.cameraForwardDistance)
         })
     }
 
+    
+
     init() {
+        const buttons = document.querySelectorAll('.button-topic');
+
         this.engine.raycaster.on('click', (intersections: THREE.Intersection[]) => {
             if (intersections.length > 0) {
                 const instanceId = intersections[0].instanceId ? intersections[0].instanceId : 0
@@ -64,13 +71,23 @@ export class OniricaInteractive implements Experience {
                     
                 }
                 this.engine.camera.animateTo(this.dreams.at(instanceId)!.position)
+                this.dreamTexts.forEach((t:Text) => {
+                    gsap.to(t, {fillOpacity: 0, ease: "expo.out", duration:0.5, onComplete: () => {
+                        gsap.to(t, {fillOpacity: 1, ease: "expo.in", duration:2.})
+                    }})
+
+                });
+
+                buttons.forEach((button, id) => {
+                    button!.textContent = this.dreams.at(this.selectedId)!.topics[id];
+                    });    
             }
+
             
         });
 
-
         const field = document.getElementById('userInput') as HTMLInputElement;
-        const search = document.getElementById('button-search') as HTMLButtonElement;
+        const search = document.getElementById('button-search') as HTMLButtonElement;  
 
         field.addEventListener("keypress", function (event: KeyboardEvent) {
             if (event.key === "Enter") {
@@ -102,11 +119,8 @@ export class OniricaInteractive implements Experience {
                 this.engine.camera.animateTo(this.dreams.at(firstQueriedDreamId)!.position);
             }
             this.updateNearest(this.cameraForwardDistance);
-            // this.projectUmap(inputValue).then((result: any) => {
-            //     this.highlightSphere!.position.x = parseFloat(result.x);
-            //     this.highlightSphere!.position.y = parseFloat(result.y);
-            //     this.highlightSphere!.position.z = parseFloat(result.z);
-            // })
+
+            
         })
 
         const buttonNext = document.getElementById('button-next') as HTMLButtonElement;
@@ -117,6 +131,18 @@ export class OniricaInteractive implements Experience {
         buttonPrevious.addEventListener('click', () => {
             this.navigateToPreviousDream();
         });
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (button.textContent != undefined && button.textContent != "") {       
+                    console.log(button.textContent.toLowerCase().trim().slice(1))         
+                    field.value = button.textContent ? button.textContent.toLowerCase().trim().slice(1) : " ";
+                    search.click();
+                }
+            });
+          });
+  
+
 
     }
 
@@ -140,7 +166,7 @@ export class OniricaInteractive implements Experience {
     // called on each render
     update() {
     //if camera pos has changed, update displayed texts
-        if (this.hasCameraChanged()) {
+        if (this.hasCameraChanged() && this.hasCSVLoaded) {
             this.updateNearest(this.cameraForwardDistance)
         }
     }

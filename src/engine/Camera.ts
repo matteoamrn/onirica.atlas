@@ -10,8 +10,8 @@ export class Camera implements GameEntity {
   private cameraWorldDir = new THREE.Vector3();
   
   
-  private minBounds = new THREE.Vector3(-2, -2, -2);
-  private maxBounds = new THREE.Vector3(2, 2, 2);
+  private minBounds = new THREE.Vector3(-2);
+  private maxBounds = new THREE.Vector3(2);
 
   constructor(private engine: Engine) {
     this.initCamera()
@@ -45,8 +45,8 @@ export class Camera implements GameEntity {
   animateTo(target_position:THREE.Vector3) {
     const new_camera_dir = this.instance.position.clone().sub(target_position).normalize().multiplyScalar(0.4)
     const pos = target_position.clone().add(new_camera_dir)
-    gsap.to(this.instance.position, {x: pos.x, y:pos.y, z:pos.z, duration: 1.5});
-    gsap.to(this.controls.target, {x: target_position.x, y:target_position.y, z: target_position.z, duration: 1.5})
+    gsap.to(this.instance.position, {x: pos.x, y:pos.y, z:pos.z, duration: 2.5, ease: "power2.inOut"});
+    gsap.to(this.controls.target, {x: target_position.x, y:target_position.y, z: target_position.z, duration: 2.5, ease: "power2.inOut"})
 }
 
 

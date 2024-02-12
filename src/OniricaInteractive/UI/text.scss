@@ -154,11 +154,12 @@
 }
 
 .button-container {
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .button-topic {
-  display: inline-block;
   outline: 0;
   text-align: center;
   cursor: pointer;
@@ -174,6 +175,9 @@
   font-weight: 400;
   box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.516);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .button-topic:hover {

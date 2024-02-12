@@ -8,7 +8,6 @@ export type TextConfig = {
 
 export class TextUI {
   private container!: HTMLDivElement;
-  private nDreams:number = 0;
 
   constructor(config: TextConfig = {}) {
     if (config.documentTitle) {
@@ -37,12 +36,18 @@ export class TextUI {
           <div id="dreamCount"> </div>
         <textarea class="scrollable-text" disabled="true"> </textarea>
         <div id="topics"> Explore other dreams about: </div>
-        <div class="button-container">
-          <button id="button-topic1" class="button-topic">Hamsters</button>
-          <button id="button-topic2" class="button-topic">Cake</button>
-          <button id="button-topic3" class="button-topic">Sleep</button>
+        <div id ="topicContainer" class="container">
+          <div class="row justify-content-center">
+            <div class="col-3 button-topic text-center"> </div>
+            <div class="col-3 button-topic text-center"> </div>
+            <div class="col-3 button-topic text-center"> </div>
+          </div>
+          <div class="row justify-content-center">
+            <div class="col-3 button-topic text-center"> </div>
+            <div class="col-3 button-topic text-center"> </div>
+          </div>
         </div>
-        `
+              `
         //<div class="separatorUp"></div> 
         
         //<div class="separatorDown"></div>  
@@ -89,12 +94,9 @@ export class TextUI {
 
   // }
 
-  // updateSearchedWord() {
-  //   const text = this.container.querySelector('#dreamCount');
-  //   const field = document.getElementById('userInput') as HTMLInputElement;
-
-  //   text!.textContent = field.value; 
-  // }
+  onClickedTopic(t:HTMLButtonElement) {
+    console.log(t)
+  }
 
 
   
