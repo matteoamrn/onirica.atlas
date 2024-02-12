@@ -60,10 +60,13 @@ export class OniricaInteractive implements Experience {
                     this.textUI.updateReportText(this.dreams.at(instanceId)!.dreamReport, instanceId.toString())
                     this.mesh!.instanceColor!.needsUpdate = true
                     this.selectedId = instanceId;
+                    
                 }
                 this.engine.camera.animateTo(this.dreams.at(instanceId)!.position)
             }
+            
         });
+
 
         const field = document.getElementById('userInput') as HTMLInputElement;
         const search = document.getElementById('button-search') as HTMLButtonElement;
@@ -78,13 +81,24 @@ export class OniricaInteractive implements Experience {
         search.addEventListener('click', () => {
             this.queriedIds = this.search(field.value, this.dreams)
             this.textUI.updateDreamCounter(this.queriedIds.length.toString())
+
+            const buttonContainer = document.querySelector('.button-other-dreams') as HTMLDivElement;
+            buttonContainer.style.display = this.queriedIds.length > 0 ? 'flex' : 'none';
+
             if (this.queriedIds) {
                 for (let i = 0; i < this.dreams.length; i++) {
                     if (this.queriedIds.includes(i))
                         this.mesh!.setColorAt(i, this.queryColor);
                     else this.mesh!.setColorAt(i, this.baseColor);
+                    
                 }
-                this.mesh!.instanceColor!.needsUpdate = true
+                this.mesh!.instanceColor!.needsUpdate = true;
+
+                const firstQueriedDreamId = this.queriedIds[0];
+                this.mesh!.setColorAt(firstQueriedDreamId, this.selectColor);
+                this.selectedId = firstQueriedDreamId;
+                this.textUI.updateReportText(this.dreams.at(firstQueriedDreamId)!.dreamReport, firstQueriedDreamId.toString());
+                this.engine.camera.animateTo(this.dreams.at(firstQueriedDreamId)!.position);
             }
             this.updateNearest(this.cameraForwardDistance);
             // this.projectUmap(inputValue).then((result: any) => {
@@ -93,6 +107,15 @@ export class OniricaInteractive implements Experience {
             //     this.highlightSphere!.position.z = parseFloat(result.z);
             // })
         })
+
+        const buttonNext = document.getElementById('button-next') as HTMLButtonElement;
+        buttonNext.addEventListener('click', () => {
+            this.navigateToNextDream();
+        });
+        const buttonPrevious = document.getElementById('button-previous') as HTMLButtonElement;
+        buttonPrevious.addEventListener('click', () => {
+            this.navigateToPreviousDream();
+        });
 
     }
 
@@ -206,6 +229,39 @@ export class OniricaInteractive implements Experience {
 
     }
     
+    navigateToNextDream() {
+        if (this.queriedIds.length > 0) {
+            const currentIndex = this.queriedIds.indexOf(this.selectedId);
+            const nextIndex = (currentIndex + 1) % this.queriedIds.length;
+            const nextDreamId = this.queriedIds[nextIndex];
+
+            this.mesh!.setColorAt(this.selectedId, this.baseColor);
+            this.mesh!.setColorAt(nextDreamId, this.selectColor);
+            this.mesh!.instanceColor!.needsUpdate = true;
+
+            this.selectedId = nextDreamId;
+
+            this.textUI.updateReportText(this.dreams.at(nextDreamId)!.dreamReport, nextDreamId.toString());
+            this.engine.camera.animateTo(this.dreams.at(nextDreamId)!.position);
+        }
+    }
+
+    navigateToPreviousDream() {
+        if (this.queriedIds.length > 0) {
+            const currentIndex = this.queriedIds.indexOf(this.selectedId);
+            const previousIndex = (currentIndex - 1 + this.queriedIds.length) % this.queriedIds.length;
+            const previousDreamId = this.queriedIds[previousIndex];
+
+            this.mesh!.setColorAt(this.selectedId, this.baseColor);
+            this.mesh!.setColorAt(previousDreamId, this.selectColor);
+            this.mesh!.instanceColor!.needsUpdate = true;
+
+            this.selectedId = previousDreamId;
+
+            this.textUI.updateReportText(this.dreams.at(previousDreamId)!.dreamReport, previousDreamId.toString());
+            this.engine.camera.animateTo(this.dreams.at(previousDreamId)!.position);
+        }
+    }
 
     async parseCSV() {
         try {
@@ -250,11 +306,6 @@ export class OniricaInteractive implements Experience {
             myText.maxWidth = 0.15
             myText.sync();
             this.dreamTexts[i] = myText;
-            // const planeGeometry = new THREE.PlaneGeometry(0.1, 0.01);
-            // const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
-            // const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-            // this.backgroundPlanes.push(plane);
-            // this.engine.scene.add(plane);
         }
         
 

@@ -34,19 +34,39 @@ export class TextUI {
           <input type="text" id="userInput" name="userInput"> </input> 
           <button id="button-search">search</button>
         </div>
-        <div class="separatorUp"></div> 
           <div id="dreamCount"> </div>
-        <div class="separatorDown"></div>   
         <textarea class="scrollable-text" disabled="true"> </textarea>
         <div id="topics"> Explore other dreams about: </div>
         <div class="button-container">
           <button id="button-topic1" class="button-topic">Hamsters</button>
           <button id="button-topic2" class="button-topic">Cake</button>
           <button id="button-topic3" class="button-topic">Sleep</button>
-        </div>`
+        </div>
+        `
+        //<div class="separatorUp"></div> 
         
+        //<div class="separatorDown"></div>  
     );
     document.body.prepend(this.container);
+
+    // Create the button container and buttons
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-other-dreams');
+
+    const buttonPrevious = document.createElement('button');
+    buttonPrevious.id = 'button-previous';
+    buttonPrevious.classList.add('button-others');
+    buttonPrevious.textContent = 'Previous dream';
+
+    const buttonNext = document.createElement('button');
+    buttonNext.id = 'button-next';
+    buttonNext.classList.add('button-others');
+    buttonNext.textContent = 'Next dream';
+
+    buttonContainer.appendChild(buttonPrevious);
+    buttonContainer.appendChild(buttonNext);
+
+    document.body.appendChild(buttonContainer);
   }
 
   updateReportText(newText: string, dreamId:string) {

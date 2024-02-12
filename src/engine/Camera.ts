@@ -22,7 +22,7 @@ export class Camera implements GameEntity {
     this.instance = new THREE.PerspectiveCamera(
       35,
       window.innerWidth / window.innerHeight,
-      0.1,
+      0.01,
       1000
     )
     this.instance.position.z = 0.1
@@ -58,7 +58,7 @@ export class Camera implements GameEntity {
       this.controls.target.add(this.cameraWorldDir.multiplyScalar(0.2));
 
     const cameraPosition = this.instance.position.clone();
-    cameraPosition.clamp(this.minBounds, this.maxBounds);
+    // cameraPosition.clamp(this.minBounds, this.maxBounds);
     this.instance.position.copy(cameraPosition);
   }
 }
