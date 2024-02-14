@@ -11,7 +11,7 @@ export class Dream {
     this.id = id;
     this.position = new THREE.Vector3(x, y, z);
     this.dreamReport = dreamReport;
-    this.topics = topics.toLocaleLowerCase().replace(".", "").split(",")
+    this.topics = topics.replace(".", "").split(",")
   }
 
   getDreamInfo(): string {
