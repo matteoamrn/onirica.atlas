@@ -229,8 +229,12 @@ export class OniricaInteractive implements Experience {
         for (let i = 0; i < Math.min(this.highlightedIds.length, this.nneighbors); i++) {
             const currentDream: Dream = this.dreams[this.highlightedIds[i]]
             const dreamEntry = this.dreamTexts.at(i);
+            
+            if (i == 0) dreamEntry.text = currentDream.dreamReport;
+            else{
             dreamEntry.text = this.selectDreamContext(currentDream.dreamReport, this.queryString, 15)
 
+            }          
             const distance = 0.005;
             const distanceY = 0.002;
             const YVector = new THREE.Vector3(0.0, 1.0, 0.0);
@@ -241,6 +245,9 @@ export class OniricaInteractive implements Experience {
             dreamEntry.rotation.setFromRotationMatrix(this.engine.camera.instance.matrixWorld);
 
             dreamEntry.sync();
+
+
+
         }
 
     }
