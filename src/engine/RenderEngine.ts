@@ -6,6 +6,7 @@ import { BlendFunction, DepthEffect, DepthOfFieldEffect, EffectComposer, EffectP
 
 export class RenderEngine implements GameEntity {
   public readonly renderer: WebGLRenderer
+
   composer: EffectComposer
 
   constructor(private engine: Engine) {
@@ -13,6 +14,7 @@ export class RenderEngine implements GameEntity {
       canvas: this.engine.canvas,
       antialias: true,
     })
+
 
     this.renderer.toneMapping = THREE.CineonToneMapping
     this.renderer.toneMappingExposure = 1.75
@@ -36,7 +38,7 @@ export class RenderEngine implements GameEntity {
       height: 2048
     });
 
-    this.engine.scene.fog = new THREE.FogExp2( 0x000000, 0.8);
+    //this.engine.scene.fog = new THREE.FogExp2( 0x000000, 0.8);
 
     const depthEffect = new DepthEffect({
       blendFunction: BlendFunction.SKIP
@@ -50,7 +52,6 @@ export class RenderEngine implements GameEntity {
 
     const effectPass = new EffectPass(
 			this.engine.camera.instance,
-			depthOfFieldEffect,
 			vignetteEffect,
 			depthEffect
 		);
@@ -62,6 +63,7 @@ export class RenderEngine implements GameEntity {
 
   update() {
     this.composer.render();
+    //this.cssRenderer.render( this.engine.scene, this.engine.camera.instance );
 
   }
 

@@ -1,4 +1,6 @@
 import './text.scss'
+import Keyboard from 'simple-keyboard';
+import 'simple-keyboard/build/css/index.css';
 
 export type TextConfig = {
   title?: string
@@ -19,38 +21,16 @@ export class TextUI {
     this.container.insertAdjacentHTML(
       'beforeend',
       `
-        ${config.title ? `<h1>${config.title}</h1>` : ''}
-        ${
-          config.report
-            ? `<div class="report">
-                <p>${config.report}</p>
-             </div>`
-            : ``
-        }
-        
-        <div class="input-prompt">
-          <label for="userInput">Search dreams containing the word:</label>
-          <input type="text" id="userInput" name="userInput"> </input> 
-          <button id="button-search">search</button>
-        </div>
-          <div id="dreamCount"> </div>
-        <textarea class="scrollable-text" disabled="true"> </textarea>
-        <div id="topics"> Explore other dreams about: </div>
-        <div id ="topicContainer" class="container">
-          <div class="row justify-content-center">
-            <div class="col-3 button-topic text-center"> </div>
-            <div class="col-3 button-topic text-center"> </div>
-            <div class="col-3 button-topic text-center"> </div>
-          </div>
-          <div class="row justify-content-center">
-            <div class="col-3 button-topic text-center"> </div>
-            <div class="col-3 button-topic text-center"> </div>
-          </div>
-        </div>
-              `
-        //<div class="separatorUp"></div> 
-        
-        //<div class="separatorDown"></div>  
+      <div class="searchBar">
+      <div id ="searchIcon" class='search-icon'>
+      <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+      <input id="userInput" class="input " />
+      </div> 
+
+      <div id="keyboardContainer" class="keyboardContainer hidden">
+      <div class="simple-keyboard" ></div>
+      </div>              `
     );
     document.body.prepend(this.container);
 
@@ -72,7 +52,10 @@ export class TextUI {
     buttonContainer.appendChild(buttonNext);
 
     document.body.appendChild(buttonContainer);
+      
+    
   }
+
 
   updateReportText(newText: string, dreamId:string) {
     const reportTextElement = this.container.querySelector('.scrollable-text') as HTMLTextAreaElement;

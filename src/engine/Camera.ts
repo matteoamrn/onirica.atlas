@@ -10,8 +10,8 @@ export class Camera implements GameEntity {
   private cameraWorldDir = new THREE.Vector3();
   
   
-  private minBounds = new THREE.Vector3(-2);
-  private maxBounds = new THREE.Vector3(2);
+  private minBounds = new THREE.Vector3(-4);
+  private maxBounds = new THREE.Vector3(4);
 
   constructor(private engine: Engine) {
     this.initCamera()
@@ -34,6 +34,9 @@ export class Camera implements GameEntity {
 
   private initControls() {
     this.controls = new OrbitControls(this.instance, this.engine.canvas)
+    this.controls.enableDamping = true;
+    this.controls.maxDistance = 15;
+
     this.controls.update()
   }
 
@@ -57,8 +60,5 @@ export class Camera implements GameEntity {
     if (this.controls!.getDistance() < 0.2)
       this.controls.target.add(this.cameraWorldDir.multiplyScalar(0.2));
 
-    const cameraPosition = this.instance.position.clone();
-    // cameraPosition.clamp(this.minBounds, this.maxBounds);
-    this.instance.position.copy(cameraPosition);
   }
 }

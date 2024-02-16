@@ -1,224 +1,135 @@
 .text-container {
+
+  position: fixed;
+  width: 40%;
+  bottom: 3%; /* Adjust as needed */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+
+  background-color: rgb(0,0,0, 0);
+  border-radius: 50%;
+
+.searchBar{
+  position: relative;
+  left: 25%;
+  width:50%;
+}
+  .search-icon {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 20%;
-    height: 90%;
-    padding: 20px; /* Adjust padding as needed */
-    z-index: 2;
-    background-color: rgb(0,0,0, 0.82);
-  
+    top: 0;  /* Align to top of container */
+    left: 0; /* Align to left of container */
+    padding: 10px;
+    height: 100%;
+    border-radius: 15px;
+    box-sizing: border-box;  /* Include padding and border in element's total height and width */
+    background-color: #f8dd5a;    
+    color:black;}
+
+  .input {
+    width: 100%;
+    padding: 10px 20px 10px 50px;  /* Increase left padding to accommodate icon */
+    border: 1px solid #b3b3b3;
+    border-radius: 15px;
+    box-sizing: border-box;  
+    font-family: 'MartianMonoBold';
+    font-size: 13px;
+    outline: none;
+    /* Adding transition effect */
+    transition: ease-in-out, width .35s ease-in-out;
+
+
+}
+
+  .scrollable-text {
+    margin-top: 30px;
+    resize: none;
+    background-color: transparent;
+    width: 100%;
+    max-height: 700px;
+    height: 70vh; 
+    position:  relative;
+    color: #ffff; 
+    text-align: center;
+    font-family: 'MartianMonoLight';
+      font-size: 13px;
+    &:focus {
+      color: #555;
+    }
     
-    .scrollable-text {
-      margin-top: 30px;
-      resize: none;
+
+    
+    &::-webkit-scrollbar {
+      width: 7px;
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.75);
+      border-radius: 10px;
+      border: 2px solid transparent;
+    }
+  
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+  
+    &::-webkit-scrollbar-track {
       background-color: transparent;
-      width: 100%;
-      max-height: 700px;
-      height: 70vh; 
-      position:  relative;
-      color: #ffff; 
-      text-align: center;
-      font-family: 'MartianMonoLight';
-        font-size: 13px;
-      &:focus {
-        color: #555;
-      }
-      
-
-      
-      &::-webkit-scrollbar {
-        width: 7px;
-      }
-    
-      &::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 255, 255, 0.75);
-        border-radius: 10px;
-        border: 2px solid transparent;
-      }
-    
-      &::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(255, 255, 255, 0.9);
-      }
-    
-      &::-webkit-scrollbar-track {
-        background-color: transparent;
-        border-radius: 100px;
-      }
+      border-radius: 100px;
     }
-  
-    h1 {
-      margin-bottom: 10px; /* Adjust margin as needed */
-    }
-  
-    .input-prompt {
-      margin-top: 20px; /* Increased margin above */
-      margin-bottom: 20px; /* Increased margin below */
-      width: 100%;
-      text-align: center;
-      font-family: 'MartianMonoLight';
-      font-size: 13px;
-    }
-    
-    .input-prompt label {
-      color: white;
-      display: block;
-      margin-bottom: 15px;
-    }
-    
-    #userInput {
-      width: 30%;
-      border: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.523); /* Adding a white line */
-      background-color: transparent;
-      padding: 5px;
-      margin-bottom: 20px;
-      color: rgb(226, 225, 133); /* Setting text color to white */
-      text-align: center;
-      font-family: 'MartianMonoBold';
-      font-size: 13px;
-      outline: none;
-      
-    }
-
-    #button-search { 
-      display: block; /* Changed from inline-block to block */
-      outline: 0;
-      text-align: center;
-      cursor: pointer;
-      padding: 0px 10px;
-      margin: auto;
-      border-radius: 2px;
-      min-width: 40px;
-      height: 25px;
-      background-color: rgb(0, 0, 0);
-      color: rgb(215, 215, 215);
-      font-family: 'MartianMonoThin';
-      font-size: 13px;
-      font-weight: 400;
-      box-sizing: border-box;
-      border: 1px solid rgba(255, 255, 255, 0.516);
-    }
-
-    #button-search:hover {
-      background-color: rgb(32, 32, 32);
-      color: rgb(255, 255, 255);
-    }
-
-    // .separatorUp {
-    //   width: 90%;
-    //   height: 1px;
-    //   background-color: rgba(255, 255, 255, 0.3);
-    //   margin-top: 20%;
-    //   margin-left: 5%;
-
-    // }
-
-    // .separatorDown {
-    //   width: 90%;
-    //   height: 1px;
-    //   background-color: rgba(255, 255, 255, 0.3);
-    //   margin-top: 40px;
-    //   margin-left: 5%;
-      
-    // }
-  
-    #dreamCount {
-      color: white;
-      font-family: 'MartianMonoLight';
-      font-size: 13px;
-      text-align: center;
-      margin: 40px 0 40px;
-      position: relative;
-
   }
 
-  #dreamCount:after {
-      content: attr(data-last-word); /* Use the data-last-word attribute value as content */
-      color: rgb(226, 225, 133); /* Set the color for the last word */
-      font-family: 'MartianMonoBold';
-      position: relative;
-
-      top: 0;
-      
+  h1 {
+    margin-bottom: 10px; /* Adjust margin as needed */
   }
 
-  #topics {
-    color: white;
+  .input-prompt {
+    margin-top: 20px; /* Increased margin above */
+    margin-bottom: 20px; /* Increased margin below */
+    width: 100%;
+    text-align: center;
     font-family: 'MartianMonoLight';
     font-size: 13px;
-    text-align: center;
-    margin: 30px 0 10px;
-    position: relative;
-
-}
-
-.button-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.button-topic {
-  outline: 0;
-  text-align: center;
-  cursor: pointer;
-  padding: 0px 10px;
-  margin: 5px; /* Adjust the margin as needed */
-  border-radius: 2px;
-  min-width: 40px;
-  height: 25px;
-  background-color: rgb(0, 0, 0);
-  color: rgb(226, 225, 133); /* Set the color for the last word */
-  font-family: 'MartianMonoBold';
-  font-size: 13px;
-  font-weight: 400;
-  box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, 0.516);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.button-topic:hover {
-  background-color: rgb(32, 32, 32);
-  //color: rgb(255, 255, 255);
-}
-
-
-}
-
-
-
-.button-other-dreams {
-  position: absolute;
-  bottom: 50%;
-  right: 5%;
-  display: none;
-  justify-content: space-between;
-  width: 70%;
+  }
   
+  .input-prompt label {
+    color: white;
+    display: block;
+    margin-bottom: 15px;
+  }
+  
+  #button-search { 
+    display: block; /* Changed from inline-block to block */
+    outline: 0;
+    text-align: center;
+    cursor: pointer;
+    padding: 0px 10px;
+    margin: auto;
+    border-radius: 2px;
+    min-width: 40px;
+    height: 25px;
+    background-color: rgb(0, 0, 0);
+    color: rgb(215, 215, 215);
+    font-family: 'MartianMonoThin';
+    font-size: 13px;
+    font-weight: 400;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.516);
+  }
+
+  #button-search:hover {
+    background-color: rgb(32, 32, 32);
+    color: rgb(255, 255, 255);
+  }
 }
 
-.button-other-dreams .button-others {
-  outline: 0;
-  text-align: center;
-  cursor: pointer;
-  padding: 0px;
-  border-radius: 50%;
-  width: 80px;
-  height: 80px;
-  background-color: rgb(0, 0, 0);
-  color: rgb(215, 215, 215);
-  font-family: 'MartianMonoThin';
-  font-size: 13px;
-  font-weight: 400;
-  box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, 0.516);
+.hidden{
+display:none;
 }
 
-.button-other-dreams .button-others:hover {
-  background-color: rgb(32, 32, 32);
-  //color: rgb(255, 255, 255);
+
+.keyboardContainer{
+  width: 50%;
+  position:relative;
+  left: 25%;
 }
-    
