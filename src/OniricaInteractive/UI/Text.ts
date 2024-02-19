@@ -22,19 +22,22 @@ export class TextUI {
       'beforeend',
       `
       <div class="searchBar">
-        <div id ="searchIcon" class='search-icon'>
+        <div id="searchIcon" class='search-icon'>
           <i class="fa-solid fa-magnifying-glass"></i>
         </div>
-        <input id="userInput" class="input " />
+        <input id="userInput" class="input" />
         <div id="crossIcon" class='cross-icon'>
-        <i class="fa-solid fa-x"></i>
-      </div>
-
+          <i class="fa-solid fa-x"></i>
+        </div>
       </div> 
 
       <div id="keyboardContainer" class="keyboardContainer hidden">
-        <div class="simple-keyboard" ></div>
-      </div>              `
+        <div class="simple-keyboard"></div>
+      </div>
+      
+
+
+    `
     );
     document.body.prepend(this.container);
     const topbar = document.createElement('div');
@@ -48,24 +51,29 @@ export class TextUI {
     document.body.prepend(topbar)
 
 
-    // // Create the button container and buttons
-    // const buttonContainer = document.createElement('div');
-    // buttonContainer.classList.add('button-other-dreams');
+    document.body.prepend(topbar);
 
-    // const buttonPrevious = document.createElement('button');
-    // buttonPrevious.id = 'button-previous';
-    // buttonPrevious.classList.add('button-others');
-    // buttonPrevious.textContent = 'Previous dream';
+    // Creazione della div per i pulsanti
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
 
-    // const buttonNext = document.createElement('button');
-    // buttonNext.id = 'button-next';
-    // buttonNext.classList.add('button-others');
-    // buttonNext.textContent = 'Next dream';
+    // Creazione dei pulsanti
+    const buttonPrevious = document.createElement('button');
+    buttonPrevious.id = 'button-previous';
+    buttonPrevious.classList.add('button-others');
+    buttonPrevious.textContent = '<';
 
-    // buttonContainer.appendChild(buttonPrevious);
-    // buttonContainer.appendChild(buttonNext);
+    const buttonNext = document.createElement('button');
+    buttonNext.id = 'button-next';
+    buttonNext.classList.add('button-others');
+    buttonNext.textContent = '>';
 
-    // document.body.appendChild(buttonContainer);
+    // Aggiunta dei pulsanti alla div dei pulsanti
+    buttonContainer.appendChild(buttonPrevious);
+    buttonContainer.appendChild(buttonNext);
+
+    // Aggiunta della div dei pulsanti al body
+    document.body.appendChild(buttonContainer);
       
     const keyboard = new Keyboard({
       onChange: input => onChange(input),

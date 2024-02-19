@@ -27,8 +27,9 @@ export class OniricaInteractive implements Experience {
     private tree: kdTree<THREE.Vector3> | undefined
 
     public baseColor = new THREE.Color();
-    public queryColor = new THREE.Color(0xf8dd5a)
+    public queryColor = new THREE.Color(0xad7157)
     public selectColor = new THREE.Color(0xe3592b)
+    public axesColor = new THREE.Color(0x4f4846)
 
     resources: Resource[] = [
     ]
@@ -47,6 +48,16 @@ export class OniricaInteractive implements Experience {
     init() {
         this.listenForClickEvents();
         this.listenForSearchEvents();
+
+        const buttonNext = document.getElementById('button-next') as HTMLButtonElement;
+        buttonNext.addEventListener('click', () => {
+            this.navigateToNextDream();
+        });
+        const buttonPrevious = document.getElementById('button-previous') as HTMLButtonElement;
+        buttonPrevious.addEventListener('click', () => {
+            this.navigateToPreviousDream();
+        });
+
     }
 
     listenForClickEvents() {
@@ -281,7 +292,7 @@ export class OniricaInteractive implements Experience {
             this.engine.scene.add(myText);
             myText.text = ""
             myText.font = "./assets/fonts/MartianMono-Regular.ttf"
-            myText.fontSize = 0.003;
+            myText.fontSize = 0.002;
             myText.color = this.queryColor;
             myText.maxWidth = 0.15
             myText.sync();
@@ -296,7 +307,7 @@ export class OniricaInteractive implements Experience {
         }
         
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        const texture = new THREE.TextureLoader().load('sprite.png' ); 
+        const texture = new THREE.TextureLoader().load('sprite2.png' ); 
         let material = new THREE.PointsMaterial( { size: 0.04, map: texture, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
 
         let sprites = new THREE.Points(geometry, material);
@@ -313,7 +324,7 @@ export class OniricaInteractive implements Experience {
 
         //add axes
         const axesHelper = new THREE.AxesHelper(6);
-        axesHelper.setColors(this.queryColor, this.queryColor, this.queryColor)
+        axesHelper.setColors(this.axesColor, this.axesColor, this.axesColor)
         this.engine.scene.add(axesHelper);
     }
 
