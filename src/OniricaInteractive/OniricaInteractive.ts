@@ -47,8 +47,6 @@ export class OniricaInteractive implements Experience {
     init() {
         this.listenForClickEvents();
         this.listenForSearchEvents();
-
-          
     }
 
     listenForClickEvents() {
@@ -102,14 +100,10 @@ export class OniricaInteractive implements Experience {
         this.queriedIds = this.search(field.value, this.dreams)
         if (this.queriedIds.length > 0) {
             this.textUI.updateDreamCounter(this.queriedIds.length.toString())
-            // const buttonContainer = document.querySelector('.button-other-dreams') as HTMLDivElement;
-            // buttonContainer.style.display = this.queriedIds.length > 0 ? 'flex' : 'none';
 
             if (this.queriedIds) {
                 const firstQueriedDreamId = this.queriedIds[0];
-                //this.mesh!.setColorAt(firstQueriedDreamId, this.selectColor);
                 this.selectedId = firstQueriedDreamId;
-                //this.textUI.updateReportText(this.dreams.at(firstQueriedDreamId)!.dreamReport, firstQueriedDreamId.toString());
                 this.engine.camera.animateTo(this.dreams.at(firstQueriedDreamId)!.position);
             }
             
@@ -306,7 +300,7 @@ export class OniricaInteractive implements Experience {
         let material = new THREE.PointsMaterial( { size: 0.04, map: texture, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
 
         let sprites = new THREE.Points(geometry, material);
-        var ghostGeo = new THREE.IcosahedronGeometry(0.004, 1)
+        var ghostGeo = new THREE.IcosahedronGeometry(0.005, 1)
         let ghostMesh = new THREE.InstancedMesh(ghostGeo, new THREE.MeshBasicMaterial(), this.dreams.length);
         const matrix = new THREE.Matrix4();
         for (let i = 0; i < this.dreams.length; i++) {

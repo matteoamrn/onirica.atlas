@@ -1,18 +1,15 @@
 import { Engine } from './Engine'
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+
 import { GameEntity } from './GameEntity'
 import gsap from 'gsap'
+import { TrackballControls } from './controls/TrackballControls'
 
 export class Camera implements GameEntity {
   public instance!: THREE.PerspectiveCamera
-  private controls!: OrbitControls
+  private controls!: TrackballControls
   private cameraWorldDir = new THREE.Vector3();
   
-  
-  private minBounds = new THREE.Vector3(-4);
-  private maxBounds = new THREE.Vector3(4);
-
   constructor(private engine: Engine) {
     this.initCamera()
     this.initControls()
@@ -25,17 +22,22 @@ export class Camera implements GameEntity {
       0.01,
       1000
     )
-    this.instance.position.z = 0.1
-    this.instance.position.y = 0.1
-    this.instance.position.x = 0.1
+    this.instance.position.z = 2
+    this.instance.position.y = 13.
+    this.instance.position.x = 13.
 
     this.engine.scene.add(this.instance)
   }
 
   private initControls() {
-    this.controls = new OrbitControls(this.instance, this.engine.canvas)
-    this.controls.enableDamping = true;
-    this.controls.maxDistance = 15;
+    this.controls = new TrackballControls(this.instance, this.engine.canvas)
+    // this.controls.touches.ONE = THREE.TOUCH.PAN;
+    // this.controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;  
+      this.controls.maxDistance = 15;
+
+    this.controls.rotateSpeed = 0.8;
+    this.controls.zoomSpeed = 0.1;
+    this.controls.panSpeed = 0.2
 
     this.controls.update()
   }
@@ -57,8 +59,7 @@ export class Camera implements GameEntity {
     this.controls.update()
     this.controls.object.getWorldDirection(this.cameraWorldDir);
 
-    if (this.controls!.getDistance() < 0.2)
-      this.controls.target.add(this.cameraWorldDir.multiplyScalar(0.2));
-
+    // if (this.controls!.getDistance() < 0.2)
+    //   this.controls.target.add(this.cameraWorldDir.multiplyScalar(0.2));
   }
 }
