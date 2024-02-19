@@ -22,37 +22,88 @@ export class TextUI {
       'beforeend',
       `
       <div class="searchBar">
-      <div id ="searchIcon" class='search-icon'>
-      <i class="fa-solid fa-magnifying-glass"></i>
+        <div id ="searchIcon" class='search-icon'>
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <input id="userInput" class="input " />
+        <div id="crossIcon" class='cross-icon'>
+        <i class="fa-solid fa-x"></i>
       </div>
-      <input id="userInput" class="input " />
+
       </div> 
 
       <div id="keyboardContainer" class="keyboardContainer hidden">
-      <div class="simple-keyboard" ></div>
+        <div class="simple-keyboard" ></div>
       </div>              `
     );
     document.body.prepend(this.container);
+    const topbar = document.createElement('div');
+    topbar.classList.add('infoBar');
+    topbar.insertAdjacentHTML(
+      'beforeend',
+      `
+      <div id="dreamCount"> </div> `
+    );
 
-    // Create the button container and buttons
-    const buttonContainer = document.createElement('div');
-    buttonContainer.classList.add('button-other-dreams');
+    document.body.prepend(topbar)
 
-    const buttonPrevious = document.createElement('button');
-    buttonPrevious.id = 'button-previous';
-    buttonPrevious.classList.add('button-others');
-    buttonPrevious.textContent = 'Previous dream';
 
-    const buttonNext = document.createElement('button');
-    buttonNext.id = 'button-next';
-    buttonNext.classList.add('button-others');
-    buttonNext.textContent = 'Next dream';
+    // // Create the button container and buttons
+    // const buttonContainer = document.createElement('div');
+    // buttonContainer.classList.add('button-other-dreams');
 
-    buttonContainer.appendChild(buttonPrevious);
-    buttonContainer.appendChild(buttonNext);
+    // const buttonPrevious = document.createElement('button');
+    // buttonPrevious.id = 'button-previous';
+    // buttonPrevious.classList.add('button-others');
+    // buttonPrevious.textContent = 'Previous dream';
 
-    document.body.appendChild(buttonContainer);
+    // const buttonNext = document.createElement('button');
+    // buttonNext.id = 'button-next';
+    // buttonNext.classList.add('button-others');
+    // buttonNext.textContent = 'Next dream';
+
+    // buttonContainer.appendChild(buttonPrevious);
+    // buttonContainer.appendChild(buttonNext);
+
+    // document.body.appendChild(buttonContainer);
       
+    const keyboard = new Keyboard({
+      onChange: input => onChange(input),
+      onKeyPress: pressed => onKeyPress(pressed)
+    });
+    
+    function onChange(input:any){
+      (document.querySelector(".input") as any)!.value = input;
+    }
+    function onKeyPress(button:any) {
+      if (button === "{shift}" || button === "{lock}") {
+          let currentLayout = keyboard.options.layoutName;
+          let shiftToggle = currentLayout === "default" ? "shift" : "default";
+        
+          keyboard.setOptions({
+            layoutName: shiftToggle
+          });
+      }
+      if (button === "{enter}") document.getElementById('searchIcon')?.click()
+      
+
+    }
+              
+    document.getElementById("crossIcon")?.addEventListener('click', () =>{
+      const field = document.getElementById('userInput') as HTMLInputElement;
+      field.value = ''
+      document.getElementById("keyboardContainer")?.classList.add("hidden");
+      const search = document.getElementById('searchIcon') as HTMLButtonElement;
+      search.click()
+    })
+
+    document.getElementById("userInput")!.addEventListener('focus', function() {
+      document.getElementById("keyboardContainer")?.classList.remove("hidden");
+    });
+    document.getElementById("keyboardContainer")!.addEventListener('blur', function() {
+      document.getElementById("keyboardContainer")?.classList.add("hidden");
+    });
+
     
   }
 
@@ -65,25 +116,19 @@ export class TextUI {
   }
   
   updateDreamCounter(ndreams: string) {
-    const text = this.container.querySelector('#dreamCount');
+    const text = document.getElementById("dreamCount");
+
+    if (ndreams == "-1")  
+    {
+      text!.textContent = '';
+      text!.removeAttribute('data-last-word')
+      return
+    }
     const userInput = document.getElementById('userInput') as HTMLInputElement;
     const lastWord = userInput.value;
     text!.textContent = ndreams + ' dreams are talking about ';
     text!.setAttribute('data-last-word', lastWord);
   }
-
-  // updateRelatedTopics(topics: string){
-
-
-  // }
-
-  onClickedTopic(t:HTMLButtonElement) {
-    console.log(t)
-  }
-
-
-  
-
 
 
 }

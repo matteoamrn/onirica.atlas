@@ -9,8 +9,6 @@ import { Text } from 'troika-three-text'
 import { kdTree } from 'kd-tree-javascript'
 import gsap from 'gsap'
 import Utils from './Utils'
-import Keyboard from 'simple-keyboard';
-import 'simple-keyboard/build/css/index.css';
 
 export class OniricaInteractive implements Experience {
     private hasCSVLoaded: boolean = false;
@@ -18,7 +16,6 @@ export class OniricaInteractive implements Experience {
     private nneighbors: number = 15;
     private textUI: TextUI = new TextUI();
     private dreams: Dream[] = [];
-    private mesh: THREE.InstancedMesh | undefined;
     private cameraPos: THREE.Vector3 = new THREE.Vector3();
     private cameraDir: THREE.Vector3 = new THREE.Vector3();
     private dreamTexts: Text[] = []; // index 0 + nneighbors
@@ -50,31 +47,7 @@ export class OniricaInteractive implements Experience {
     init() {
         this.listenForClickEvents();
         this.listenForSearchEvents();
-        const keyboard = new Keyboard({
-            onChange: input => onChange(input),
-            onKeyPress: pressed => onKeyPress(pressed)
-          });
-          
-          function onChange(input:any){
-            (document.querySelector(".input") as any)!.value = input;
-          }
-          function onKeyPress(button:any) {
-            if (button === "{shift}" || button === "{lock}") {
-                let currentLayout = keyboard.options.layoutName;
-                let shiftToggle = currentLayout === "default" ? "shift" : "default";
-              
-                keyboard.setOptions({
-                  layoutName: shiftToggle
-                });
-            }
-            if (button === "{enter}") document.getElementById('searchIcon')?.click()
-            
 
-          }
-                    
-          document.getElementById("userInput")!.addEventListener('focus', function() {
-            document.getElementById("keyboardContainer")?.classList.remove("hidden");
-          });
           
     }
 
@@ -121,13 +94,16 @@ export class OniricaInteractive implements Experience {
     
     queryDreams() {
         const field = document.getElementById('userInput') as HTMLInputElement;
-
+        if(field.value == "" || field.value == " ") 
+        {
+            this.resetQuery()
+            return
+        }
         this.queriedIds = this.search(field.value, this.dreams)
         if (this.queriedIds.length > 0) {
-            //this.textUI.updateDreamCounter(this.queriedIds.length.toString())
-
-            const buttonContainer = document.querySelector('.button-other-dreams') as HTMLDivElement;
-            buttonContainer.style.display = this.queriedIds.length > 0 ? 'flex' : 'none';
+            this.textUI.updateDreamCounter(this.queriedIds.length.toString())
+            // const buttonContainer = document.querySelector('.button-other-dreams') as HTMLDivElement;
+            // buttonContainer.style.display = this.queriedIds.length > 0 ? 'flex' : 'none';
 
             if (this.queriedIds) {
                 const firstQueriedDreamId = this.queriedIds[0];
@@ -136,23 +112,17 @@ export class OniricaInteractive implements Experience {
                 //this.textUI.updateReportText(this.dreams.at(firstQueriedDreamId)!.dreamReport, firstQueriedDreamId.toString());
                 this.engine.camera.animateTo(this.dreams.at(firstQueriedDreamId)!.position);
             }
+            
             this.updateNearest(this.cameraForwardDistance);
         }    
     }
+    resetQuery() {
+        this.queriedIds = []
+        this.queryString = ''
+        this.textUI.updateDreamCounter("-1")
+        this.updateNearest(this.cameraForwardDistance);
 
-    listenForTopicSelection() {
-        const buttons = document.querySelectorAll('.button-topic');
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                if (button.textContent != undefined && button.textContent != "") {
-                    const field = document.getElementById('userInput') as HTMLInputElement;
-                    const search = document.getElementById('button-search') as HTMLButtonElement;
-                    field.value = button.textContent ? button.textContent.toLowerCase().trim().slice(1) : " ";
-                    search.click();
-                }
-            });
-        });
-    }
+        }
 
     // Called on resize
     resize() { }
@@ -191,7 +161,7 @@ export class OniricaInteractive implements Experience {
         let temp = this.getNearestDreamIndices(this.queryString == '' ? this.dreams : this.dreams. //cycle over all dreams or filter only ones containing query word
             filter((d: Dream) => this.queriedIds.includes(d.id)), futurePos)
         if (temp) {
-            this.highlightedIds = [this.selectedId, ...temp.filter(t => t != -1)]
+            this.highlightedIds = [this.selectedId, ...temp.filter(t => (t != -1 && t != this.selectedId))]
             this.updatedreamTexts()
             //this.updateNeighboursColor()
         }
@@ -225,7 +195,7 @@ export class OniricaInteractive implements Experience {
 
     updatedreamTexts() {
         const cameraDir = this.engine.camera.instance.getWorldDirection(new THREE.Vector3()).normalize();
-
+        
         for (let i = 0; i < Math.min(this.highlightedIds.length, this.nneighbors); i++) {
             const currentDream: Dream = this.dreams[this.highlightedIds[i]]
             const dreamEntry = this.dreamTexts.at(i);
@@ -245,9 +215,6 @@ export class OniricaInteractive implements Experience {
             dreamEntry.rotation.setFromRotationMatrix(this.engine.camera.instance.matrixWorld);
 
             dreamEntry.sync();
-
-
-
         }
 
     }
@@ -255,27 +222,14 @@ export class OniricaInteractive implements Experience {
     selectDreamContext(dreamReport: string, searchTerm: string, contextLength: number): string {
         const words = dreamReport.split(" ");
         if (searchTerm == '') return words.slice(0, 25).join(" ") + "..."
-
+  
         const index = words.findIndex(word => word.toLowerCase() === searchTerm.toLowerCase());
         if (index === -1) {
-            return words.slice(0, 25).join(" ") + "..."; // Search term not found in text
+          return words.slice(0, 25).join(" ") + "..."; // Search term not found in text
         }
         const startIndex = Math.max(0, index - contextLength);
         const endIndex = Math.min(words.length, index + contextLength + 1);
         return words.slice(startIndex, endIndex).join(" ");
-
-    }
-
-
-    updateNeighboursColor() {
-        const highlightedAndQueriedIds = [this.selectedId, ...this.highlightedIds, ...this.queriedIds];
-        this.dreams.forEach((_d: Dream, i: number) => {
-            if(this.selectedId == i) var color = this.selectColor;
-            else color = highlightedAndQueriedIds.includes(i) ? this.queryColor : this.baseColor;
-            this.mesh!.setColorAt(i, color);
-        })
-        this.mesh!.instanceColor!.needsUpdate = true;
-
     }
 
     navigateToNextDream() {
