@@ -60,21 +60,17 @@ export class TextUI {
     // Creazione dei pulsanti
     const buttonPrevious = document.createElement('button');
     buttonPrevious.id = 'button-previous';
-    buttonPrevious.classList.add('button-others');
+    buttonPrevious.classList.add('button-prev', 'btn');
     buttonPrevious.textContent = '<';
 
     const buttonNext = document.createElement('button');
     buttonNext.id = 'button-next';
-    buttonNext.classList.add('button-others');
+    buttonNext.classList.add('button-next' ,'btn');
     buttonNext.textContent = '>';
 
-    // Aggiunta dei pulsanti alla div dei pulsanti
-    buttonContainer.appendChild(buttonPrevious);
-    buttonContainer.appendChild(buttonNext);
+    document.body.appendChild(buttonPrevious);
+    document.body.appendChild(buttonNext);
 
-    // Aggiunta della div dei pulsanti al body
-    document.body.appendChild(buttonContainer);
-      
     const keyboard = new Keyboard({
       onChange: input => onChange(input),
       onKeyPress: pressed => onKeyPress(pressed)
@@ -97,13 +93,10 @@ export class TextUI {
 
     }
               
-    document.getElementById("crossIcon")?.addEventListener('click', () =>{
-      const field = document.getElementById('userInput') as HTMLInputElement;
-      field.value = ''
-      document.getElementById("keyboardContainer")?.classList.add("hidden");
-      const search = document.getElementById('searchIcon') as HTMLButtonElement;
-      search.click()
-    })
+
+    document.getElementById("keyboardContainer")?.classList.add("hidden");
+    const search = document.getElementById('searchIcon') as HTMLButtonElement;
+    search.click()
 
     document.getElementById("userInput")!.addEventListener('focus', function() {
       document.getElementById("keyboardContainer")?.classList.remove("hidden");

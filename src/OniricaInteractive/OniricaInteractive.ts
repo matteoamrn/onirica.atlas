@@ -58,6 +58,12 @@ export class OniricaInteractive implements Experience {
             this.navigateToPreviousDream();
         });
 
+        document.getElementById("crossIcon")?.addEventListener('click', () =>{
+            const field = document.getElementById('userInput') as HTMLInputElement;
+            field.value = ''
+            this.resetQuery()
+          })
+
     }
 
     listenForClickEvents() {
@@ -307,7 +313,7 @@ export class OniricaInteractive implements Experience {
         }
         
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        const texture = new THREE.TextureLoader().load('sprite2.png' ); 
+        const texture = new THREE.TextureLoader().load('sprite.png' ); 
         let material = new THREE.PointsMaterial( { size: 0.04, map: texture, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
 
         let sprites = new THREE.Points(geometry, material);

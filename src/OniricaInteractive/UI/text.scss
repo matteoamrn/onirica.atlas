@@ -101,17 +101,26 @@
   top: 0;
 }
 
-.button-container {
+.button-next {
   position: fixed;
   top: 50%;
-  left: 10px;
   right: 10px;
   transform: translateY(-50%);
   display: flex;
   justify-content: space-between;
 }
 
-.button-container .button-others {
+.button-prev {
+  position: fixed;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.btn {
   outline: 0;
   text-align: center;
   cursor: pointer;
