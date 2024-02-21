@@ -10,6 +10,7 @@ export type TextConfig = {
 
 export class TextUI {
   private container!: HTMLDivElement;
+  private keyboard: Keyboard
 
   constructor(config: TextConfig = {}) {
     if (config.documentTitle) {
@@ -18,9 +19,13 @@ export class TextUI {
 
     this.container = document.createElement('div');
     this.container.classList.add('text-container');
+    this.container.prepend
     this.container.insertAdjacentHTML(
       'beforeend',
       `
+      <div id="homeIcon" class='home-icon'>
+      <i class="fas fa-home"></i> 
+      </div>
       <div class="searchBar">
         <div id="searchIcon" class='search-icon'>
           <i class="fa-solid fa-magnifying-glass"></i>
@@ -34,11 +39,9 @@ export class TextUI {
       <div id="keyboardContainer" class="keyboardContainer hidden">
         <div class="simple-keyboard"></div>
       </div>
-      
-
-
-    `
+      `
     );
+
     document.body.prepend(this.container);
     const topbar = document.createElement('div');
     topbar.classList.add('infoBar');
@@ -49,9 +52,6 @@ export class TextUI {
     );
 
     document.body.prepend(topbar)
-
-
-    document.body.prepend(topbar);
 
     // Creazione della div per i pulsanti
     const buttonContainer = document.createElement('div');
@@ -71,28 +71,28 @@ export class TextUI {
     document.body.appendChild(buttonPrevious);
     document.body.appendChild(buttonNext);
 
-    const keyboard = new Keyboard({
-      onChange: input => onChange(input),
-      onKeyPress: pressed => onKeyPress(pressed)
-    });
-    
-    function onChange(input:any){
-      (document.querySelector(".input") as any)!.value = input;
-    }
-    function onKeyPress(button:any) {
-      if (button === "{shift}" || button === "{lock}") {
-          let currentLayout = keyboard.options.layoutName;
+    this.keyboard = new Keyboard({
+      onChange: input => {
+        const inputElement = document.getElementById("userInput") as HTMLInputElement;
+        inputElement.value = input
+  
+      },
+      onKeyPress: button => {
+        if (button === "{shift}" || button === "{lock}") {
+          let currentLayout = this.keyboard.options.layoutName;
           let shiftToggle = currentLayout === "default" ? "shift" : "default";
         
-          keyboard.setOptions({
+          this.keyboard.setOptions({
             layoutName: shiftToggle
           });
       }
-      if (button === "{enter}") document.getElementById('searchIcon')?.click()
-      
+      if (button === "{enter}") {
+        document.getElementById('searchIcon')?.click()
+     }
 
-    }
-              
+      }
+    });
+                  
 
     document.getElementById("keyboardContainer")?.classList.add("hidden");
     const search = document.getElementById('searchIcon') as HTMLButtonElement;
@@ -125,11 +125,21 @@ export class TextUI {
       text!.removeAttribute('data-last-word')
       return
     }
+    else if (ndreams == "0"){
+      const userInput = document.getElementById('userInput') as HTMLInputElement;
+      const lastWord = userInput.value;
+      text!.textContent = "No dreams found containing the word: " ;
+      text!.setAttribute('data-last-word', lastWord);
+      return
+    }
     const userInput = document.getElementById('userInput') as HTMLInputElement;
     const lastWord = userInput.value;
     text!.textContent = ndreams + ' dreams are talking about ';
     text!.setAttribute('data-last-word', lastWord);
   }
 
+  resetKeyboard(){
+    this.keyboard.clearInput()
+  }
 
 }

@@ -59,8 +59,6 @@ export class Engine {
       this.loader.setProgress(progress)
     })
 
-
-    //this.camera.instance.fov = 40
   }
 
   update(delta: number) {

@@ -38,7 +38,7 @@ export class RenderEngine implements GameEntity {
       height: 2048
     });
 
-    //this.engine.scene.fog = new THREE.FogExp2( 0x000000, 0.8);
+    //this.engine.scene.fog = new THREE.Fog( 0x000000, 2.5, 20);
 
     const depthEffect = new DepthEffect({
       blendFunction: BlendFunction.SKIP
@@ -63,7 +63,6 @@ export class RenderEngine implements GameEntity {
 
   update() {
     this.composer.render();
-    //this.cssRenderer.render( this.engine.scene, this.engine.camera.instance );
 
   }
 

@@ -19,6 +19,7 @@ export class OniricaInteractive implements Experience {
     private cameraPos: THREE.Vector3 = new THREE.Vector3();
     private cameraDir: THREE.Vector3 = new THREE.Vector3();
     private dreamTexts: Text[] = []; // index 0 + nneighbors
+    private dreamHighlight: THREE.InstancedMesh | undefined;
 
     private selectedId: number = 0 // the one user clicked on
     private highlightedIds: number[] = [] // the ones close to the camera forward position
@@ -49,20 +50,24 @@ export class OniricaInteractive implements Experience {
         this.listenForClickEvents();
         this.listenForSearchEvents();
 
-        const buttonNext = document.getElementById('button-next') as HTMLButtonElement;
-        buttonNext.addEventListener('click', () => {
+        document.getElementById('button-next')?.addEventListener('click', () => {
             this.navigateToNextDream();
         });
-        const buttonPrevious = document.getElementById('button-previous') as HTMLButtonElement;
-        buttonPrevious.addEventListener('click', () => {
+         document.getElementById('button-previous')?.addEventListener('click', () => {
             this.navigateToPreviousDream();
         });
 
         document.getElementById("crossIcon")?.addEventListener('click', () =>{
-            const field = document.getElementById('userInput') as HTMLInputElement;
-            field.value = ''
+            const inputElement = document.getElementById("userInput") as HTMLInputElement;
+            if (inputElement) inputElement.value = "";
+            this.textUI.resetKeyboard()
             this.resetQuery()
           })
+
+          document.getElementById('homeIcon')?.addEventListener('click', () => {
+              this.engine.camera.reset()
+          });
+  
 
     }
 
@@ -115,8 +120,9 @@ export class OniricaInteractive implements Experience {
             return
         }
         this.queriedIds = this.search(field.value, this.dreams)
+        this.textUI.updateDreamCounter(this.queriedIds.length.toString())
+
         if (this.queriedIds.length > 0) {
-            this.textUI.updateDreamCounter(this.queriedIds.length.toString())
 
             if (this.queriedIds) {
                 const firstQueriedDreamId = this.queriedIds[0];
@@ -141,7 +147,6 @@ export class OniricaInteractive implements Experience {
     update() {
         if (this.hasCameraChanged() && this.hasCSVLoaded) {
             this.updateNearest(this.cameraForwardDistance)
-            console.log('update')
         }
     }
 
@@ -151,6 +156,8 @@ export class OniricaInteractive implements Experience {
             this.textUI.updateReportText(this.dreams.at(instanceId)!.dreamReport, instanceId.toString());
             this.selectedId = instanceId;
             this.engine.camera.animateTo(this.dreams.at(instanceId)!.position);
+            this.engine.camera.update();
+
             this.updateDreamTextsOpacity();
             //this.updateButtons();
         }
@@ -174,8 +181,18 @@ export class OniricaInteractive implements Experience {
         if (temp) {
             this.highlightedIds = [this.selectedId, ...temp.filter(t => (t != -1 && t != this.selectedId))]
             this.updatedreamTexts()
-            //this.updateNeighboursColor()
+            this.updateNeighboursPosition()
         }
+    }
+    updateNeighboursPosition() {
+        const m = new THREE.Matrix4();
+        for (let i = 0; i < this.nneighbors; i++){
+            const currentid = this.highlightedIds[i]
+            m.setPosition(this.dreams.at(currentid)!.position)
+            this.dreamHighlight?.setMatrixAt(i, m)
+        }
+        this.dreamHighlight!.instanceMatrix.needsUpdate = true;
+
     }
 
     hasCameraChanged() {
@@ -302,7 +319,16 @@ export class OniricaInteractive implements Experience {
             myText.color = this.queryColor;
             myText.maxWidth = 0.15
             myText.sync();
-            this.dreamTexts[i] = myText;    
+            this.dreamTexts[i] = myText;   
+        }
+        var geo = new THREE.IcosahedronGeometry(0.006, 5)
+
+        this.dreamHighlight = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({color: this.queryColor}), this.nneighbors)
+        const m = new THREE.Matrix4();
+
+        for (let i = 0; i < this.nneighbors; i++) {
+            m.setPosition(1000); //randomize pos
+            this.dreamHighlight.setMatrixAt(i, m);
         }
 
         var geometry = new THREE.BufferGeometry();
@@ -317,7 +343,7 @@ export class OniricaInteractive implements Experience {
         let material = new THREE.PointsMaterial( { size: 0.04, map: texture, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
 
         let sprites = new THREE.Points(geometry, material);
-        var ghostGeo = new THREE.IcosahedronGeometry(0.005, 1)
+        var ghostGeo = new THREE.IcosahedronGeometry(0.006, 1)
         let ghostMesh = new THREE.InstancedMesh(ghostGeo, new THREE.MeshBasicMaterial(), this.dreams.length);
         const matrix = new THREE.Matrix4();
         for (let i = 0; i < this.dreams.length; i++) {
@@ -325,7 +351,7 @@ export class OniricaInteractive implements Experience {
             ghostMesh.setMatrixAt(i, matrix);
         }
 
-        this.engine.scene.add(sprites);
+        this.engine.scene.add(sprites, this.dreamHighlight);
         this.engine.raycaster.setIntersectionObjects([ghostMesh])
 
         //add axes

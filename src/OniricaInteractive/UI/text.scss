@@ -28,6 +28,20 @@
   cursor: pointer;
 }
 
+.home-icon {
+  position: absolute;
+  top: 0;
+  right: 20%;
+  padding: 10px;
+  height: 40px;
+  border-radius: 18px; /* Set to 0 for sharp edges */
+  box-sizing: border-box;
+  background-color: #a7a7a77b;
+  color: black;
+  cursor: pointer;
+}
+
+
 
 .cross-icon {
   position: absolute;
