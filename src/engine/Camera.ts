@@ -3,14 +3,20 @@ import * as THREE from 'three'
 
 import { GameEntity } from './GameEntity'
 import gsap from 'gsap'
-import { TrackballControls } from './controls/TrackballControls'
-import { ArcballControls } from 'three/examples/jsm/controls/ArcballControls';
+import CameraControls from 'camera-controls';
+
+
+CameraControls.install( { THREE: THREE } );
+const clock = new THREE.Clock()
 
 export class Camera implements GameEntity {
   public instance!: THREE.PerspectiveCamera
-  private controls!: ArcballControls
-  private cameraWorldDir = new THREE.Vector3();
-  
+  private controls!: CameraControls;
+
+  private initPos = new THREE.Vector3(2, 5, 13);
+  private cameraWorldDir: THREE.Vector3 = new THREE.Vector3(0)
+  private cameraTarget: THREE.Vector3 = new THREE.Vector3(0)
+
   constructor(private engine: Engine) {
     this.initCamera()
     this.initControls()
@@ -23,27 +29,26 @@ export class Camera implements GameEntity {
       0.01,
       1000
     )
-    this.instance.position.z = 2
-    this.instance.position.y = 5.
-    this.instance.position.x = 13.
+    this.instance.position.set(this.initPos.x, this.initPos.y, this.initPos.z)
 
     this.engine.scene.add(this.instance)
   }
 
   private initControls() {
-    this.controls = new ArcballControls(this.instance, this.engine.canvas)
-    // this.controls.state.ONE = THREE.TOUCH.PAN;
-    // this.controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;  
-      this.controls.maxDistance = 15;
+    this.controls = new CameraControls(this.instance, this.engine.canvas)
+    // this.controls.minDistance = 0.2;
 
-    this.controls.rotateSpeed = 0.5;
-    this.controls.dampingFactor = 30
-    this.controls.scaleFactor = 0.2
-    this.controls.adjustNearFar = true
-    // this.controls.zoomSpeed = 0.1;
-    // this.controls.panSpeed = 0.2
+    this.controls.maxDistance = 15;
+    this.controls.smoothTime = 1.5
+    this.controls.dollyToCursor = true
+    this.controls.dollySpeed = 0.7
+    // this.controls.infinityDolly = true
+    // this.controls.zoomToCursor = true
+    // this.controls.enableDamping = true
+    // this.controls.screenSpacePanning = true
+    // this.controls.dampingFactor = 25
+    // this.controls.wMax = 20
 
-    this.controls.update()
   }
 
   resize() {
@@ -54,16 +59,32 @@ export class Camera implements GameEntity {
   animateTo(target_position:THREE.Vector3) {
     const new_camera_dir = this.instance.position.clone().sub(target_position).normalize().multiplyScalar(0.4)
     const pos = target_position.clone().add(new_camera_dir)
-    gsap.to(this.instance.position, {x: pos.x, y:pos.y, z:pos.z, duration: 2.5, ease: "power2.inOut"});
-    gsap.to(this.controls.target, {x: target_position.x, y:target_position.y, z: target_position.z, duration: 2.5, ease: "power2.inOut"})
+
+   // gsap.to(this.instance.position, {x: pos.x, y:pos.y, z:pos.z, duration: 3.5, ease: "power2.inOut"});
+    //gsap.to(this.controls., {x: target_position.x, y:target_position.y, z: target_position.z, duration: 3.5, ease: "power2.inOut"})
+    this.controls.setLookAt(pos.x, pos.y, pos.z, target_position.x, target_position.y, target_position.z, true)
+
 }
 
 
   update() {
-    this.controls.update()
-    // this.controls.object.getWorldDirection(this.cameraWorldDir);
+    const delta = clock.getDelta();
+    this.controls.update(delta)
 
-    // if (this.controls!.getDistance() < 0.2)
-    //   this.controls.target.add(this.cameraWorldDir.multiplyScalar(0.2));
-  }
+    this.controls.camera.getWorldDirection(this.cameraWorldDir)
+
+
+    if (this.controls.distance < 0.2) {
+      var new_target = this.instance.position.clone().add(this.cameraWorldDir.normalize().multiplyScalar(0.2))
+      this.controls.setTarget(new_target.x, new_target.y, new_target.z)
+    }
+
+
+
+}
+
+  reset() {
+    this.controls.setLookAt( this.initPos.x, this.initPos.y, this.initPos.z, 0, 0, 0, true)
+}
+
 }

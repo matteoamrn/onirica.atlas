@@ -412,6 +412,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"camera-controls@npm:^2.8.3":
+  version: 2.8.3
+  resolution: "camera-controls@npm:2.8.3"
+  peerDependencies:
+    three: ">=0.126.1"
+  checksum: dbd3e794b690c27ad4cccfac1b2bdfa36b2f516b917d4093bce284d2edb14e4e040c6e1b9d4dcfb609f671968663300dc6a591366f4306fd5cdf4b5f3acf546a
+  languageName: node
+  linkType: hard
+
 "chalk@npm:5.3.0":
   version: 5.3.0
   resolution: "chalk@npm:5.3.0"
@@ -1678,6 +1687,7 @@ __metadata:
     "@types/kd-tree-javascript": ^1.0.3
     "@types/papaparse": ^5.3.14
     "@types/three": ^0.156.0
+    camera-controls: ^2.8.3
     gsap: ^3.12.5
     husky: ^8.0.3
     kd-tree-javascript: ^1.0.3
