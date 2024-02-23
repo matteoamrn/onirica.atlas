@@ -78,7 +78,7 @@
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .keyboardContainer {
@@ -168,3 +168,29 @@
 // .button-container .button-others.right {
 //   margin-right: 10px;
 // }
+
+
+.simple-keyboard.blackTheme {
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 0;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.simple-keyboard.blackTheme .hg-button {
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.simple-keyboard.blackTheme .hg-button:active {
+  background: #1c4995;
+  color: white;
+}
+
+#root .simple-keyboard.blackTheme + .simple-keyboard-preview {
+  background: #1c4995;
+}

@@ -60,18 +60,20 @@ export class TextUI {
     // Creazione dei pulsanti
     const buttonPrevious = document.createElement('button');
     buttonPrevious.id = 'button-previous';
-    buttonPrevious.classList.add('button-prev', 'btn');
+    buttonPrevious.classList.add('button-prev', 'btn', 'hidden');
     buttonPrevious.textContent = '<';
 
     const buttonNext = document.createElement('button');
     buttonNext.id = 'button-next';
-    buttonNext.classList.add('button-next' ,'btn');
+    buttonNext.classList.add('button-next' ,'btn', 'hidden');
     buttonNext.textContent = '>';
 
     document.body.appendChild(buttonPrevious);
     document.body.appendChild(buttonNext);
 
     this.keyboard = new Keyboard({
+      theme: "hg-theme-default blackTheme",
+
       onChange: input => {
         const inputElement = document.getElementById("userInput") as HTMLInputElement;
         inputElement.value = input
@@ -140,6 +142,23 @@ export class TextUI {
 
   resetKeyboard(){
     this.keyboard.clearInput()
+    this.hideButtons()
+  }
+
+  showButtons(){
+    const buttonPrevious = document.getElementById('button-previous');
+    buttonPrevious?.classList.remove('hidden');
+    const buttonNext= document.getElementById('button-next');
+    buttonNext?.classList.remove('hidden');
+
+  }
+
+  hideButtons(){
+    const buttonPrevious = document.getElementById('button-previous');
+    buttonPrevious?.classList.add('hidden');
+    const buttonNext= document.getElementById('button-next');
+    buttonNext?.classList.add('hidden');
+
   }
 
 }
