@@ -2,7 +2,7 @@ import { WebGLRenderer } from 'three'
 import { Engine } from './Engine'
 import * as THREE from 'three'
 import { GameEntity } from './GameEntity'
-import { BlendFunction, DepthEffect, DepthOfFieldEffect, EffectComposer, EffectPass, VignetteEffect, RenderPass } from 'postprocessing'
+import { BlendFunction, DepthEffect, EffectComposer, EffectPass, VignetteEffect, RenderPass } from 'postprocessing'
 
 export class RenderEngine implements GameEntity {
   public readonly renderer: WebGLRenderer
@@ -31,12 +31,12 @@ export class RenderEngine implements GameEntity {
       this.engine.camera.instance
     )
 
-    const depthOfFieldEffect = new DepthOfFieldEffect(this.engine.camera.instance, {
-      focusDistance: 0.1,
-      focalLength: 2,
-      bokehScale: 8,
-      height: 2048
-    });
+    // const depthOfFieldEffect = new DepthOfFieldEffect(this.engine.camera.instance, {
+    //   focusDistance: 0.1,
+    //   focalLength: 2,
+    //   bokehScale: 8,
+    //   height: 2048
+    // });
 
     //this.engine.scene.fog = new THREE.Fog( 0x000000, 2.5, 20);
 

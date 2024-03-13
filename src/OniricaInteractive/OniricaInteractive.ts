@@ -5,6 +5,7 @@ import { Resource } from '../engine/Resources'
 import { Dream } from './Dream';
 import Papa from 'papaparse';
 import { TextUI } from './UI/Text';
+// @ts-ignore
 import { Text } from 'troika-three-text'
 import { kdTree } from 'kd-tree-javascript'
 import gsap from 'gsap'

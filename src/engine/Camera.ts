@@ -2,7 +2,6 @@ import { Engine } from './Engine'
 import * as THREE from 'three'
 
 import { GameEntity } from './GameEntity'
-import gsap from 'gsap'
 import CameraControls from 'camera-controls';
 
 
@@ -15,7 +14,6 @@ export class Camera implements GameEntity {
 
   private initPos = new THREE.Vector3(2, 5, 13);
   private cameraWorldDir: THREE.Vector3 = new THREE.Vector3(0)
-  private cameraTarget: THREE.Vector3 = new THREE.Vector3(0)
 
   constructor(private engine: Engine) {
     this.initCamera()
