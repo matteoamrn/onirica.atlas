@@ -10,6 +10,7 @@ import { Text } from 'troika-three-text'
 import { kdTree } from 'kd-tree-javascript'
 import gsap from 'gsap'
 import Utils from './Utils'
+import martianMonoRegular from '../../assets/fonts/MartianMono-Regular.ttf'
 
 export class OniricaInteractive implements Experience {
     private hasCSVLoaded: boolean = false;
@@ -326,7 +327,7 @@ export class OniricaInteractive implements Experience {
             const myText: Text = new Text();
             this.engine.scene.add(myText);
             myText.text = ""
-            myText.font = "./assets/fonts/MartianMono-Regular.ttf"
+            myText.font = martianMonoRegular;
             myText.fontSize = 0.002;
             myText.color = this.queryColor;
             myText.maxWidth = 0.15
