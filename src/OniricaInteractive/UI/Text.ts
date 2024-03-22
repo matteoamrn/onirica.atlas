@@ -73,7 +73,10 @@ export class TextUI {
 
     this.keyboard = new Keyboard({
       theme: "hg-theme-default blackTheme",
-
+      excludeFromLayout: {
+        default: ["@", ".com"],
+        shift: ["@", ".com"]
+      },
       onChange: input => {
         const inputElement = document.getElementById("userInput") as HTMLInputElement;
         inputElement.value = input
