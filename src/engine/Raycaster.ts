@@ -10,6 +10,8 @@ export class Raycaster extends EventEmitter {
   constructor(private engine: Engine) {
     super()
     this.raycaster = new THREE.Raycaster()
+    this.raycaster.params.Points!.threshold = 0.01
+
     this.pointer = new THREE.Vector2()
 
     document.addEventListener('mousemove', (event) => {

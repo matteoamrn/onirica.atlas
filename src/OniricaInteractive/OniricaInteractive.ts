@@ -75,8 +75,9 @@ export class OniricaInteractive implements Experience {
 
     listenForClickEvents() {
         this.engine.raycaster.on('click', (intersections: THREE.Intersection[]) => {
+            console.log(intersections)
             if (intersections.length > 0) {
-                const instanceId = intersections[0].instanceId ? intersections[0].instanceId : 0;
+                const instanceId = intersections[0].index ? intersections[0].index : 0;
                 this.onDreamSelection(instanceId);
             }
         });
@@ -243,8 +244,7 @@ export class OniricaInteractive implements Experience {
             
             if (i == 0) dreamEntry.text = currentDream.dreamReport;
             else{
-            dreamEntry.text = this.selectDreamContext(currentDream.dreamReport, this.queryString, 15)
-
+                dreamEntry.text = this.selectDreamContext(currentDream.dreamReport, this.queryString, 15)
             }          
             const distance = 0.007;
             const distanceY = 0.003;
@@ -350,15 +350,14 @@ export class OniricaInteractive implements Experience {
 
 
         // create ghost geometry for raycasting (not rendered)
-        var ghostGeo = new THREE.IcosahedronGeometry(0.006, 1)
-        const ghostMesh = new THREE.InstancedMesh(ghostGeo, new THREE.MeshBasicMaterial(), this.dreams.length);
+        // var ghostGeo = new THREE.IcosahedronGeometry(0.006, 1)
+        // const ghostMesh = new THREE.InstancedMesh(ghostGeo, new THREE.MeshBasicMaterial(), this.dreams.length);
         const matrix = new THREE.Matrix4();
-        for (let i = 0; i < this.dreams.length; i++) {
-            matrix.setPosition(this.dreams[i].position);
-            ghostMesh.setMatrixAt(i, matrix);
-        }
-        ghostMesh.matrixWorldNeedsUpdate = true
-
+        // for (let i = 0; i < this.dreams.length; i++) {
+        //     matrix.setPosition(this.dreams[i].position);
+        //     ghostMesh.setMatrixAt(i, matrix);
+        // }
+        // ghostMesh.matrixWorldNeedsUpdate = true
 
         // create geometry for highlighting queried words
         const highlightGeo = new THREE.IcosahedronGeometry(0.006, 4)
@@ -369,10 +368,9 @@ export class OniricaInteractive implements Experience {
             matrix.setPosition(this.dreams[i].position);
             this.highlightMesh.setMatrixAt(i, matrix);
         }
-        ghostMesh.matrixWorldNeedsUpdate = true
 
         this.engine.scene.add(sprites, this.highlightMesh);
-        this.engine.raycaster.setIntersectionObjects([ghostMesh])
+        this.engine.raycaster.setIntersectionObjects([sprites])
 
 
 
