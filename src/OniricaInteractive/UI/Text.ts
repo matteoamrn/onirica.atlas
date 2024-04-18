@@ -144,7 +144,7 @@ export class TextUI {
   }
 
   resetKeyboard(){
-    this.keyboard!.clearInput()
+    //this.keyboard!.clearInput()
     this.hideButtons()
   }
 

@@ -14,6 +14,7 @@ export class Camera implements GameEntity {
 
   private initPos = new THREE.Vector3(2, 5, 13);
   private cameraWorldDir: THREE.Vector3 = new THREE.Vector3(0)
+  public enableAutorotate:boolean = false;
 
   constructor(private engine: Engine) {
     this.initCamera()
@@ -69,7 +70,10 @@ export class Camera implements GameEntity {
 
     this.controls.camera.getWorldDirection(this.cameraWorldDir)
 
+    if(this.enableAutorotate){
+      this.controls.azimuthAngle += 3. * delta * THREE.MathUtils.DEG2RAD;
 
+    }
     if (this.controls.distance < 0.2) {
       var new_target = this.instance.position.clone().add(this.cameraWorldDir.normalize().multiplyScalar(0.2))
       this.controls.setTarget(new_target.x, new_target.y, new_target.z)

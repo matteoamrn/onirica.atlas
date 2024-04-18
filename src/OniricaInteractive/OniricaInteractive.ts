@@ -6,11 +6,12 @@ import { Dream } from './Dream';
 import Papa from 'papaparse';
 import { TextUI } from './UI/Text';
 // @ts-ignore
-import { Text } from 'troika-three-text'
+import { Text, getSelectionRects } from 'troika-three-text'
 import { kdTree } from 'kd-tree-javascript'
 import gsap from 'gsap'
 import Utils from './Utils'
 import martianMonoRegular from '../../assets/fonts/MartianMono-Regular.ttf'
+import InactivityTracker from './InactivityTracker';
 
 export class OniricaInteractive implements Experience {
     private hasCSVLoaded: boolean = false;
@@ -23,21 +24,23 @@ export class OniricaInteractive implements Experience {
     private dreamTexts: Text[] = []; // index 0 + nneighbors
     private highlightMesh: THREE.InstancedMesh | undefined
 
+    private inactivityManager:InactivityTracker = InactivityTracker.getInstance()
+
     private selectedId: number = 0 // the one user clicked on
     private highlightedIds: number[] = [] // the ones close to the camera forward position
     private queriedIds: number[] = []  // the ones that contain the word from user input
 
     private tree: kdTree<THREE.Vector3> | undefined
+    private points: THREE.Points | undefined
 
-    public baseColor = new THREE.Color();
-    public queryColor = new THREE.Color(0xe3592b)
-    public selectColor = new THREE.Color(0xe3592b)
+    public baseColor = new THREE.Color(0xe6e6e6);
+    public selectColor = new THREE.Color(0xffffff)
+    public neighborColor = new THREE.Color(0xf8dd5a)
     public axesColor = new THREE.Color(0x4f4846)
 
     resources: Resource[] = [
     ]
     queryString: string = '';
-
 
     constructor(private engine: Engine) {
         this.parseCSV().finally(() => {
@@ -69,13 +72,23 @@ export class OniricaInteractive implements Experience {
           document.getElementById('homeIcon')?.addEventListener('click', () => {
               this.engine.camera.reset()
           });
-  
+
+          this.inactivityManager.addEventListener('inactive', () =>{
+            this.engine.camera.reset();
+            this.resetQuery()
+            this.engine.camera.enableAutorotate = true
+            }
+        );
+
+        this.inactivityManager.addEventListener('active', () =>{
+            this.engine.camera.enableAutorotate = false
+            }
+        )
 
     }
 
     listenForClickEvents() {
         this.engine.raycaster.on('click', (intersections: THREE.Intersection[]) => {
-            console.log(intersections)
             if (intersections.length > 0) {
                 const instanceId = intersections[0].index ? intersections[0].index : 0;
                 this.onDreamSelection(instanceId);
@@ -115,7 +128,7 @@ export class OniricaInteractive implements Experience {
    
     queryDreams() {
         const field = document.getElementById('userInput') as HTMLInputElement;
-        this.updateColouredMesh(this.queriedIds, 0)
+        this.updatePointColor(this.queriedIds, this.baseColor)
         this.textUI.showButtons()
 
         if(field.value == "" || field.value == " ") 
@@ -132,7 +145,7 @@ export class OniricaInteractive implements Experience {
                 const firstQueriedDreamId = this.queriedIds[0];
                 this.selectedId = firstQueriedDreamId;
                 this.engine.camera.animateTo(this.dreams.at(firstQueriedDreamId)!.position);
-                this.updateColouredMesh(this.queriedIds, 1)
+                this.updatePointColor(this.queriedIds, this.neighborColor)
             }
 
             //update tree if dreams to select are less than the total
@@ -146,8 +159,8 @@ export class OniricaInteractive implements Experience {
     resetQuery() {
         //reset tree distance
         this.tree = new kdTree(this.dreams.map(a => a.position), Utils.distance, ["x", "y", "z"]);
-
-        this.updateColouredMesh(this.queriedIds, 0)
+        this.dreamTexts[0].colorRanges = null;
+        this.updatePointColor(this.queriedIds, this.baseColor)
         this.queriedIds = []
         this.queryString = ''
         this.textUI.updateDreamCounter("-1")
@@ -162,7 +175,8 @@ export class OniricaInteractive implements Experience {
     update() {
         if (this.hasCameraChanged() && this.hasCSVLoaded) {
             this.updateNearest(this.cameraForwardDistance)
-        }
+        }    
+    
     }
 
     // Called when dream selection changes
@@ -191,27 +205,28 @@ export class OniricaInteractive implements Experience {
 
     updateNearest(stepDistance: number) {
         const futurePos = this.getFuturePosition(stepDistance)
-        this.updateColouredMesh(this.highlightedIds, 0)
+        this.updatePointColor(this.highlightedIds, this.baseColor)
 
         let temp = this.getNearestDreamIndices(this.queryString == '' ? this.dreams : this.dreams. //cycle over all dreams or filter only ones containing query word
             filter((d: Dream) => this.queriedIds.includes(d.id)), futurePos)
         if (temp) {
             this.highlightedIds = [this.selectedId, ...temp.filter(t => (t != -1 && t != this.selectedId ))]
-            console.log(this.highlightedIds)
+
             this.updatedreamTexts()
-            this.updateColouredMesh(this.highlightedIds, 1)
+            this.updatePointColor(this.highlightedIds, this.neighborColor)
         }
 
     }
 
-    updateColouredMesh(ids: number[], scale:number) {
+    updatePointColor(ids: number[], color: THREE.Color) {
+        let colorAttribute = this.points?.geometry.getAttribute('color')
         ids.forEach((id:number) => {
-            const matrix = new THREE.Matrix4()
-            matrix.makeScale(scale, scale, scale)
-            matrix.setPosition(this.dreams[id].position);
-            this.highlightMesh?.setMatrixAt(id, matrix);
+            colorAttribute?.setXYZ( id, color.r, color.g, color.b ) 
+
         })
-        this.highlightMesh!.instanceMatrix.needsUpdate = true
+        
+        //@ts-ignore 
+        colorAttribute.needsUpdate = true
     }
 
     hasCameraChanged() {
@@ -246,10 +261,18 @@ export class OniricaInteractive implements Experience {
                 const currentDream: Dream = this.dreams[this.highlightedIds[i]];
         
                 if (i == 0) {
+                    if (this.queryString != ''){
+                        const startIndex = currentDream.dreamReport.indexOf(this.queryString)
+                        const endIndex = startIndex + this.queryString.length;
+
+                        dreamEntry.colorRanges = {0: 0xfffffff, [startIndex]: 0xff0000, [endIndex]: 0xffffff};
+                    }
                     dreamEntry.text = currentDream.dreamReport;
-                    this.dreamTexts.at(i)
                 }
-                else dreamEntry.text = this.selectDreamContext(currentDream.dreamReport, this.queryString, 15)
+                else {
+                    dreamEntry.text = this.selectDreamContext(currentDream.dreamReport, this.queryString, 15)
+                    dreamEntry.colorRanges = null;
+                }
         
                 const distance = 0.007;
                 const distanceY = 0.003;
@@ -263,8 +286,6 @@ export class OniricaInteractive implements Experience {
             } else {
                 dreamEntry.text = ""; // reset
             }
-        
-            dreamEntry.sync();
             
         }
 
@@ -339,40 +360,31 @@ export class OniricaInteractive implements Experience {
             myText.text = ""
             myText.font = martianMonoRegular;
             myText.fontSize = 0.002;
-            myText.color = this.queryColor;
+            myText.color = this.baseColor;
             myText.maxWidth = 0.15
             myText.sync();
             this.dreamTexts[i] = myText;   
         }
 
         var geometry = new THREE.BufferGeometry();
-        let vertices = [];
+        let vertices = []
+        let colors = [];
+        let c = new THREE.Color(1, 1, 1);
 
         for (let i = 0; i < this.dreams.length; i++) {
             vertices.push(this.dreams[i].position.x, this.dreams[i].position.y, this.dreams[i].position.z);
+            colors.push(c.r, c.g, c.b );
         }
         
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
         const texture = new THREE.TextureLoader().load('sprite.png' ); 
-        let material = new THREE.PointsMaterial( { size: 0.04, map: texture, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } )
-        let sprites = new THREE.Points(geometry, material);
-        
-        const matrix = new THREE.Matrix4();
+        let material = new THREE.PointsMaterial( { size: 0.04, map: texture, vertexColors: true, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } )
+        this.points = new THREE.Points(geometry, material);
 
-        // create geometry for highlighting queried words
-        const highlightGeo = new THREE.IcosahedronGeometry(0.006, 4)
-
-        this.highlightMesh = new THREE.InstancedMesh(highlightGeo, new THREE.MeshBasicMaterial({color: this.queryColor}), this.dreams.length);
-        for (let i = 0; i < this.dreams.length; i++) {
-            matrix.makeScale(0, 0, 0)
-            matrix.setPosition(this.dreams[i].position);
-            this.highlightMesh.setMatrixAt(i, matrix);
-        }
-
-        this.engine.scene.add(sprites, this.highlightMesh);
-        this.engine.raycaster.setIntersectionObjects([sprites])
-
+        this.engine.scene.add(this.points);
+        this.engine.raycaster.setIntersectionObjects([this.points])
 
 
         //add axes
