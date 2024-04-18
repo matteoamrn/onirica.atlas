@@ -58,8 +58,6 @@ export class Camera implements GameEntity {
     const new_camera_dir = this.instance.position.clone().sub(target_position).normalize().multiplyScalar(0.4)
     const pos = target_position.clone().add(new_camera_dir)
 
-   // gsap.to(this.instance.position, {x: pos.x, y:pos.y, z:pos.z, duration: 3.5, ease: "power2.inOut"});
-    //gsap.to(this.controls., {x: target_position.x, y:target_position.y, z: target_position.z, duration: 3.5, ease: "power2.inOut"})
     this.controls.setLookAt(pos.x, pos.y, pos.z, target_position.x, target_position.y, target_position.z, true)
 
 }
