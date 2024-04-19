@@ -16,6 +16,8 @@
   },
   "type": "module",
   "dependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
     "camera-controls": "^2.8.3",
     "gsap": "^3.12.5",
     "kd-tree-javascript": "^1.0.3",

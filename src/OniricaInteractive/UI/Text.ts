@@ -10,7 +10,7 @@ export type TextConfig = {
 
 export class TextUI {
   private container!: HTMLDivElement;
-  private keyboard: Keyboard | undefined
+  private keyboard: Keyboard 
 
   constructor(config: TextConfig = {}) {
     if (config.documentTitle) {
@@ -30,7 +30,7 @@ export class TextUI {
         <div id="searchIcon" class='search-icon'>
           <i class="fa-solid fa-magnifying-glass"></i>
         </div>
-        <input id="userInput" class="input" />
+        <input id="userInput" class="input" inputmode='none'>
         <div id="crossIcon" class='cross-icon'>
           <i class="fa-solid fa-x"></i>
         </div>
@@ -71,35 +71,35 @@ export class TextUI {
     document.body.appendChild(buttonPrevious);
     document.body.appendChild(buttonNext);
 
-    // this.keyboard = new Keyboard({
-    //   theme: "hg-theme-default blackTheme",
-    //   excludeFromLayout: {
-    //     default: ["@", ".com"],
-    //     shift: ["@", ".com"]
-    //   },
-    //   onChange: input => {
-    //     const inputElement = document.getElementById("userInput") as HTMLInputElement;
-    //     inputElement.value = input
+    this.keyboard = new Keyboard({
+      theme: "hg-theme-default blackTheme",
+      excludeFromLayout: {
+        default: ["@", ".com"],
+        shift: ["@", ".com"]
+      },
+      onChange: input => {
+        const inputElement = document.getElementById("userInput") as HTMLInputElement;
+        inputElement.value = input
   
-    //   },
-    //   onKeyPress: button => {
-    //     if (button === "{shift}" || button === "{lock}") {
-    //       let currentLayout = this.keyboard.options.layoutName;
-    //       let shiftToggle = currentLayout === "default" ? "shift" : "default";
+      },
+      onKeyPress: button => {
+        if (button === "{shift}" || button === "{lock}") {
+          let currentLayout = this.keyboard.options.layoutName;
+          let shiftToggle = currentLayout === "default" ? "shift" : "default";
         
-    //       this.keyboard.setOptions({
-    //         layoutName: shiftToggle
-    //       });
-    //   }
-    //   if (button === "{enter}") {
-    //     document.getElementById('searchIcon')?.click()
-    //  }
+          this.keyboard.setOptions({
+            layoutName: shiftToggle
+          });
+      }
+      if (button === "{enter}") {
+        document.getElementById('searchIcon')?.click()
+     }
 
-    //   }
-    // });
+      }
+    });
                   
 
-    // document.getElementById("keyboardContainer")?.c\lassList.add("hidden");
+    document.getElementById("keyboardContainer")?.classList.add("hidden");
     const search = document.getElementById('searchIcon') as HTMLButtonElement;
     search.click()
 
@@ -144,7 +144,7 @@ export class TextUI {
   }
 
   resetKeyboard(){
-    //this.keyboard!.clearInput()
+    this.keyboard!.clearInput()
     this.hideButtons()
   }
 

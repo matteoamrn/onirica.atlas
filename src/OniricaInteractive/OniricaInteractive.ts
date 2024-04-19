@@ -22,7 +22,6 @@ export class OniricaInteractive implements Experience {
     private cameraPos: THREE.Vector3 = new THREE.Vector3();
     private cameraDir: THREE.Vector3 = new THREE.Vector3();
     private dreamTexts: Text[] = []; // index 0 + nneighbors
-    private highlightMesh: THREE.InstancedMesh | undefined
 
     private inactivityManager:InactivityTracker = InactivityTracker.getInstance()
 
@@ -165,8 +164,6 @@ export class OniricaInteractive implements Experience {
         this.queryString = ''
         this.textUI.updateDreamCounter("-1")
         this.updateNearest(this.cameraForwardDistance);
-        this.highlightMesh!.instanceMatrix.needsUpdate = true
-
         }
 
     // Called on resize
