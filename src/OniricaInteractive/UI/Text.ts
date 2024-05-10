@@ -1,6 +1,7 @@
 import './text.scss'
 import Keyboard from 'simple-keyboard';
 import 'simple-keyboard/build/css/index.css';
+import layout from "simple-keyboard-layouts/build/layouts/spanish";
 
 export type TextConfig = {
   title?: string
@@ -11,6 +12,7 @@ export type TextConfig = {
 export class TextUI {
   private container!: HTMLDivElement;
   private keyboard: Keyboard 
+  public isOriginal: boolean = true
 
   constructor(config: TextConfig = {}) {
     if (config.documentTitle) {
@@ -23,9 +25,6 @@ export class TextUI {
     this.container.insertAdjacentHTML(
       'beforeend',
       `
-      <div id="homeIcon" class='home-icon'>
-      <i class="fas fa-home"></i> 
-      </div>
       <div class="searchBar">
         <div id="searchIcon" class='search-icon'>
           <i class="fa-solid fa-magnifying-glass"></i>
@@ -35,6 +34,17 @@ export class TextUI {
           <i class="fa-solid fa-x"></i>
         </div>
       </div> 
+      <div id="homeIcon" class='home-icon'>
+      <i class="fas fa-home"></i> 
+      </div>
+      <div id="langIcon">
+      <input type="checkbox" id="toggle" class="toggleCheckbox" />
+      <label for="toggle" class="toggleContainer">
+        <div>Original</div>   
+      <div>Traducción</div>
+      </label>
+      </div>
+
 
       <div id="keyboardContainer" class="keyboardContainer hidden">
         <div class="simple-keyboard"></div>
@@ -73,6 +83,7 @@ export class TextUI {
 
     this.keyboard = new Keyboard({
       theme: "hg-theme-default blackTheme",
+      ...layout,
       excludeFromLayout: {
         default: ["@", ".com"],
         shift: ["@", ".com"]
@@ -106,9 +117,20 @@ export class TextUI {
     document.getElementById("userInput")!.addEventListener('focus', function() {
       document.getElementById("keyboardContainer")?.classList.remove("hidden");
     });
+    document.getElementById("userInput")!.addEventListener('focusout', function() {
+      document.getElementById("keyboardContainer")?.classList.add("hidden");
+      console.log('out')
+    });
+
+
     document.getElementById("keyboardContainer")!.addEventListener('blur', function() {
       document.getElementById("keyboardContainer")?.classList.add("hidden");
     });
+
+    document.getElementById("keyboardContainer")!.addEventListener('blur', function() {
+      document.getElementById("keyboardContainer")?.classList.add("hidden");
+    });
+
 
     
   }

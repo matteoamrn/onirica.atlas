@@ -42,7 +42,7 @@ class InactivityTracker extends THREE.EventDispatcher<InactiveEvent> {
             this.isUserActive = false;
             this.dispatchEvent({ type: "inactive", message: 'inactive' });
 
-        }, 10 * 1000); // 10 seconds
+        }, 60 * 1000); // TO MSeconds
     }
 
 

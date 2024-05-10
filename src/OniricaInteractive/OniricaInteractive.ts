@@ -34,8 +34,10 @@ export class OniricaInteractive implements Experience {
 
     public baseColor = new THREE.Color(0xe6e6e6);
     public selectColor = new THREE.Color(0xffffff)
-    public neighborColor = new THREE.Color(0xf8dd5a)
+    public neighborColor = new THREE.Color(0x727acf)
     public axesColor = new THREE.Color(0x4f4846)
+
+    public maxTextWidth = 0.10
 
     resources: Resource[] = [
     ]
@@ -71,6 +73,13 @@ export class OniricaInteractive implements Experience {
           document.getElementById('homeIcon')?.addEventListener('click', () => {
               this.engine.camera.reset()
           });
+
+          document.getElementById('toggle')?.addEventListener('click', () => {
+
+            this.textUI.isOriginal = !this.textUI.isOriginal
+            this.updateDreamTexts()
+            
+        });
 
           this.inactivityManager.addEventListener('inactive', () =>{
             this.engine.camera.reset();
@@ -179,11 +188,14 @@ export class OniricaInteractive implements Experience {
     // Called when dream selection changes
     onDreamSelection(instanceId: number) {
         if (instanceId != this.selectedId) {
-            this.textUI.updateReportText(this.dreams.at(instanceId)!.dreamReport, instanceId.toString());
             this.selectedId = instanceId;
-            this.engine.camera.animateTo(this.dreams.at(instanceId)!.position);
-            this.engine.camera.update();
+            const dreamPos : THREE.Vector3 = this.dreams.at(instanceId)!.position;
+            // const YVector = new THREE.Vector3(0.0, 1.0, 0.0);
+            // const perpendicularVector = new THREE.Vector3().crossVectors(this.cameraDir, YVector).normalize();
+            // const newPosition = dreamPos.clone().addScaledVector(perpendicularVector, this.maxTextWidth*0.5);
 
+            this.engine.camera.animateTo(dreamPos);
+            this.engine.camera.update();
 
             this.updateDreamTextsOpacity();
             //this.updateButtons();
@@ -209,7 +221,7 @@ export class OniricaInteractive implements Experience {
         if (temp) {
             this.highlightedIds = [this.selectedId, ...temp.filter(t => (t != -1 && t != this.selectedId ))]
 
-            this.updatedreamTexts()
+            this.updateDreamTexts()
             this.updatePointColor(this.highlightedIds, this.neighborColor)
         }
 
@@ -227,9 +239,8 @@ export class OniricaInteractive implements Experience {
     }
 
     hasCameraChanged() {
-        if (this.engine.camera.instance.position.equals(this.cameraPos)) {
-            return false
-        }
+        if (this.engine.camera.instance.position.equals(this.cameraPos)) return false
+
         this.cameraDir = this.engine.camera.instance.getWorldDirection(this.cameraDir).normalize()
         this.cameraPos.copy(this.engine.camera.instance.position)
         return true
@@ -249,30 +260,31 @@ export class OniricaInteractive implements Experience {
         });
     }
 
-    updatedreamTexts() {
+    updateDreamTexts() {
         const cameraDir = this.engine.camera.instance.getWorldDirection(new THREE.Vector3()).normalize();
         for (let i = 0; i < this.nneighbors; i++) {
             const dreamEntry = this.dreamTexts.at(i);
 
             if (i < this.highlightedIds.length) {
                 const currentDream: Dream = this.dreams[this.highlightedIds[i]];
-        
+                const text = currentDream.getReport(this.textUI.isOriginal)
                 if (i == 0) {
                     if (this.queryString != ''){
-                        const startIndex = currentDream.dreamReport.indexOf(this.queryString)
+                        const startIndex = text.indexOf(this.queryString)
                         const endIndex = startIndex + this.queryString.length;
 
-                        dreamEntry.colorRanges = {0: 0xfffffff, [startIndex]: 0xff0000, [endIndex]: 0xffffff};
+                        dreamEntry.colorRanges = {0: 0xfffffff, [startIndex]: 0x2f3bbd, [endIndex]: 0xffffff};
                     }
-                    dreamEntry.text = currentDream.dreamReport;
+                    //"│───────────────────────────────────────────────────────────────────────────│ \n\n" + 
+                    dreamEntry.text = text;
                 }
                 else {
-                    dreamEntry.text = this.selectDreamContext(currentDream.dreamReport, this.queryString, 15)
+                    dreamEntry.text = this.selectDreamContext(text, this.queryString, 15)
                     dreamEntry.colorRanges = null;
                 }
         
-                const distance = 0.007;
-                const distanceY = 0.003;
+                const distance = -this.maxTextWidth*0.5;
+                const distanceY = -0.006;
                 const YVector = new THREE.Vector3(0.0, 1.0, 0.0);
                 const perpendicularVector = new THREE.Vector3().crossVectors(cameraDir, YVector).normalize();
                 const perpendicularVectorY = new THREE.Vector3().crossVectors(perpendicularVector, cameraDir).normalize();
@@ -334,9 +346,11 @@ export class OniricaInteractive implements Experience {
                         const y = parseFloat(row.y) * scale;
                         const z = parseFloat(row.z) * scale;
                         const dreamReport = String(row.report);
-                        const topics = String(row.keywords)
+                        const dreamReport_es = String(row.report_es);
 
-                        const dream = new Dream(id, x, y, z, dreamReport, topics);
+                        //const topics = String(row.keywords)
+
+                        const dream = new Dream(id, x, y, z, dreamReport, dreamReport_es);
                         this.dreams.push(dream);
 
                     })
@@ -355,10 +369,11 @@ export class OniricaInteractive implements Experience {
             const myText: Text = new Text();
             this.engine.scene.add(myText);
             myText.text = ""
+            myText.textAlign = 'center'
             myText.font = martianMonoRegular;
             myText.fontSize = 0.002;
             myText.color = this.baseColor;
-            myText.maxWidth = 0.15
+            myText.maxWidth = this.maxTextWidth
             myText.sync();
             this.dreamTexts[i] = myText;   
         }
@@ -394,7 +409,7 @@ export class OniricaInteractive implements Experience {
         this.queryString = word;
         const indices: number[] = [];
         dreams.forEach((dream, index) => {
-            if (dream.dreamReport.includes(" " + word + " ")) {
+            if (dream.getReport(this.textUI.isOriginal).includes(" " + word + " ")) {
                 indices.push(index);
             }
         });

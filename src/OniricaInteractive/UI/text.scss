@@ -31,7 +31,7 @@
 .home-icon {
   position: absolute;
   top: 0;
-  right: 18%;
+  left: 22%;
   padding: 10px;
   height: 40px;
   border-radius: 18px; /* Set to 0 for sharp edges */
@@ -40,10 +40,75 @@
   color: rgb(175, 175, 175);
   cursor: pointer;
   border-color:rgb(129, 129, 129);
-  border-width: 1px; 
+  border-width: 0px; 
   border-style: solid; 
 }
 
+
+.toggleCheckbox {
+  display: none;
+}
+
+.toggleContainer {
+  position: absolute;
+  top:3px;
+  right:18vh;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: fit-content;
+  border: 1px solid #ffffff;
+  border-radius: 20px;
+  background: #52525200;
+  font-family: 'MartianMonoThin';
+  font-size:12px;
+  color: #525252;
+  cursor: pointer;
+}
+
+.toggleContainer::before {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  left: 0%;
+  border-radius:20px;
+  background: white;
+  transition: all 0.3s;
+}
+
+.toggleContainer div {
+  padding: 6px;
+  text-align: center;
+  z-index: 1;
+}
+
+.toggleCheckbox:checked + .toggleContainer::before {
+  left: 50%;
+}
+
+.toggleCheckbox:checked + .toggleContainer div:first-child{
+  color: white;
+  transition: color 0.3s;
+}
+.toggleCheckbox:checked + .toggleContainer div:last-child{
+  color: #343434;
+  transition: color 0.3s;
+}
+.toggleCheckbox + .toggleContainer div:first-child{
+  color: #343434;
+  transition: color 0.3s;
+}
+.toggleCheckbox + .toggleContainer div:last-child{
+  color: white;
+  transition: color 0.3s;
+}
+
+.invert{
+  background-color: rgb(175, 175, 175);
+  color: #000000 !important;
+
+
+}
 
 
 .cross-icon {
@@ -115,7 +180,7 @@
 
 #dreamCount:after {
   content: attr(data-last-word);
-  color: rgb(186, 135, 97);
+  color: #727acf;
   font-family: 'MartianMonoBold';
   position: relative;
   top: 0;

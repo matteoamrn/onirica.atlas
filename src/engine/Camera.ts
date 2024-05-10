@@ -38,12 +38,11 @@ export class Camera implements GameEntity {
     // this.controls.minDistance = 0.2;
 
     this.controls.maxDistance = 15;
-    this.controls.smoothTime = 1.5
+    this.controls.smoothTime = 1.9
     this.controls.dollyToCursor = true
     this.controls.dollySpeed = 0.7
     // this.controls.infinityDolly = true
     // this.controls.zoomToCursor = true
-    // this.controls.enableDamping = true
     // this.controls.screenSpacePanning = true
     // this.controls.dampingFactor = 25
     // this.controls.wMax = 20
@@ -56,7 +55,7 @@ export class Camera implements GameEntity {
   }
 
   animateTo(target_position:THREE.Vector3) {
-    const new_camera_dir = this.instance.position.clone().sub(target_position).normalize().multiplyScalar(0.4)
+    const new_camera_dir = this.instance.position.clone().sub(target_position).normalize().multiplyScalar(0.25)
     const pos = target_position.clone().add(new_camera_dir)
 
     this.controls.setLookAt(pos.x, pos.y, pos.z, target_position.x, target_position.y, target_position.z, true)
