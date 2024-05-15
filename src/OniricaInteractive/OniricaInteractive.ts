@@ -400,7 +400,7 @@ export class OniricaInteractive implements Experience {
         let c = new THREE.Color(1, 1, 1);
 
         for (let i = 0; i < this.dreams?.size!; i++) {
-            vertices.push(this.dreams?.get(i)?.position.x, this.dreams?.get(i)?.position.y, this.dreams?.get(i)?.position.z);
+            vertices.push(this.dreams.get(i)!.position.x, this.dreams.get(i)!.position.y, this.dreams.get(i)!.position.z);
             colors.push(c.r, c.g, c.b );
         }
         
