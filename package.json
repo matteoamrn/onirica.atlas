@@ -12,12 +12,15 @@
     "preview": "vite preview",
     "cleanup": "node ./scripts/cleanup.js",
     "prepare": "husky install",
-    "preinstall": "git submodule update --init --recursive"
+    "preinstall": "git submodule update --init --recursive",
+    "ionic:build": "npm run build",
+    "ionic:serve": "npm run dev"
   },
   "type": "module",
   "dependencies": {
     "@capacitor/cli": "^6.0.0",
     "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
     "camera-controls": "^2.8.3",
     "gsap": "^3.12.5",
     "kd-tree-javascript": "^1.0.3",
@@ -27,7 +30,8 @@
     "simple-keyboard": "^3.7.58",
     "simple-keyboard-layouts": "^3.3.102",
     "three": "^0.157.0",
-    "troika-three-text": "^0.49.0"
+    "troika-three-text": "^0.49.0",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@types/kd-tree-javascript": "^1.0.3",

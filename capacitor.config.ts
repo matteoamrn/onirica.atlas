@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.example.app',
-  appName: 'onirica.webapp',
+  appId: 'fuse.onirica.web',
+  appName: 'oniricaweb.app',
   webDir: 'dist'
 };
 
