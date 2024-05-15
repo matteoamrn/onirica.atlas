@@ -14,6 +14,7 @@ export class Camera implements GameEntity {
 
   private initPos = new THREE.Vector3(2, 5, 13);
   private cameraWorldDir: THREE.Vector3 = new THREE.Vector3(0)
+  public enableAutorotate:boolean = false;
 
   constructor(private engine: Engine) {
     this.initCamera()
@@ -37,12 +38,11 @@ export class Camera implements GameEntity {
     // this.controls.minDistance = 0.2;
 
     this.controls.maxDistance = 15;
-    this.controls.smoothTime = 1.5
+    this.controls.smoothTime = 1.9
     this.controls.dollyToCursor = true
     this.controls.dollySpeed = 0.7
     // this.controls.infinityDolly = true
     // this.controls.zoomToCursor = true
-    // this.controls.enableDamping = true
     // this.controls.screenSpacePanning = true
     // this.controls.dampingFactor = 25
     // this.controls.wMax = 20
@@ -55,11 +55,9 @@ export class Camera implements GameEntity {
   }
 
   animateTo(target_position:THREE.Vector3) {
-    const new_camera_dir = this.instance.position.clone().sub(target_position).normalize().multiplyScalar(0.4)
+    const new_camera_dir = this.instance.position.clone().sub(target_position).normalize().multiplyScalar(0.25)
     const pos = target_position.clone().add(new_camera_dir)
 
-   // gsap.to(this.instance.position, {x: pos.x, y:pos.y, z:pos.z, duration: 3.5, ease: "power2.inOut"});
-    //gsap.to(this.controls., {x: target_position.x, y:target_position.y, z: target_position.z, duration: 3.5, ease: "power2.inOut"})
     this.controls.setLookAt(pos.x, pos.y, pos.z, target_position.x, target_position.y, target_position.z, true)
 
 }
@@ -71,7 +69,10 @@ export class Camera implements GameEntity {
 
     this.controls.camera.getWorldDirection(this.cameraWorldDir)
 
+    if(this.enableAutorotate){
+      this.controls.azimuthAngle += 3. * delta * THREE.MathUtils.DEG2RAD;
 
+    }
     if (this.controls.distance < 0.2) {
       var new_target = this.instance.position.clone().add(this.cameraWorldDir.normalize().multiplyScalar(0.2))
       this.controls.setTarget(new_target.x, new_target.y, new_target.z)

@@ -1,6 +1,7 @@
 import './text.scss'
 import Keyboard from 'simple-keyboard';
 import 'simple-keyboard/build/css/index.css';
+import layout from "simple-keyboard-layouts/build/layouts/spanish";
 
 export type TextConfig = {
   title?: string
@@ -10,7 +11,8 @@ export type TextConfig = {
 
 export class TextUI {
   private container!: HTMLDivElement;
-  private keyboard: Keyboard
+  private keyboard: Keyboard 
+  public isOriginal: boolean = true
 
   constructor(config: TextConfig = {}) {
     if (config.documentTitle) {
@@ -19,18 +21,14 @@ export class TextUI {
 
     this.container = document.createElement('div');
     this.container.classList.add('text-container');
-    this.container.prepend
     this.container.insertAdjacentHTML(
       'beforeend',
       `
-      <div id="homeIcon" class='home-icon'>
-      <i class="fas fa-home"></i> 
-      </div>
-      <div class="searchBar">
+     <div class="searchBar">
         <div id="searchIcon" class='search-icon'>
           <i class="fa-solid fa-magnifying-glass"></i>
         </div>
-        <input id="userInput" class="input" />
+        <input id="userInput" class="input" inputmode='none'>
         <div id="crossIcon" class='cross-icon'>
           <i class="fa-solid fa-x"></i>
         </div>
@@ -41,6 +39,29 @@ export class TextUI {
       </div>
       `
     );
+
+    let homeIcon = document.createElement('div');
+    homeIcon.insertAdjacentHTML('beforeend',
+    `
+    <div id="homeIcon" class='home-icon'>
+    <i class="fas fa-home"></i> 
+    </div>
+    `
+    )
+    document.body.prepend(homeIcon)
+
+    let langIcon = document.createElement('div')
+    langIcon.insertAdjacentHTML('beforeend',
+    `
+    <input type="checkbox" id="toggle" class="toggleCheckbox" />
+    <label for="toggle" class="toggleContainer">
+      <div>Original</div>   
+    <div>Traducción</div>
+    </label>
+    `
+    )
+    document.body.append(langIcon)
+
 
     document.body.prepend(this.container);
     const topbar = document.createElement('div');
@@ -73,6 +94,7 @@ export class TextUI {
 
     this.keyboard = new Keyboard({
       theme: "hg-theme-default blackTheme",
+      ...layout,
       excludeFromLayout: {
         default: ["@", ".com"],
         shift: ["@", ".com"]
@@ -106,9 +128,19 @@ export class TextUI {
     document.getElementById("userInput")!.addEventListener('focus', function() {
       document.getElementById("keyboardContainer")?.classList.remove("hidden");
     });
+    document.getElementById("userInput")!.addEventListener('focusout', function() {
+      document.getElementById("keyboardContainer")?.classList.add("hidden");
+      console.log('out')
+    });
+
     document.getElementById("keyboardContainer")!.addEventListener('blur', function() {
       document.getElementById("keyboardContainer")?.classList.add("hidden");
     });
+
+    document.getElementById("keyboardContainer")!.addEventListener('blur', function() {
+      document.getElementById("keyboardContainer")?.classList.add("hidden");
+    });
+
 
     
   }
@@ -144,7 +176,7 @@ export class TextUI {
   }
 
   resetKeyboard(){
-    this.keyboard.clearInput()
+    this.keyboard!.clearInput()
     this.hideButtons()
   }
 

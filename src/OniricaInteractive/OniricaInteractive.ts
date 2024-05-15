@@ -6,11 +6,12 @@ import { Dream } from './Dream';
 import Papa from 'papaparse';
 import { TextUI } from './UI/Text';
 // @ts-ignore
-import { Text } from 'troika-three-text'
+import { Text, getSelectionRects } from 'troika-three-text'
 import { kdTree } from 'kd-tree-javascript'
 import gsap from 'gsap'
 import Utils from './Utils'
 import martianMonoRegular from '../../assets/fonts/MartianMono-Regular.ttf'
+import InactivityTracker from './InactivityTracker';
 
 export class OniricaInteractive implements Experience {
     private hasCSVLoaded: boolean = false;
@@ -21,23 +22,26 @@ export class OniricaInteractive implements Experience {
     private cameraPos: THREE.Vector3 = new THREE.Vector3();
     private cameraDir: THREE.Vector3 = new THREE.Vector3();
     private dreamTexts: Text[] = []; // index 0 + nneighbors
-    private highlightMesh: THREE.InstancedMesh | undefined
+
+    private inactivityManager:InactivityTracker = InactivityTracker.getInstance()
 
     private selectedId: number = 0 // the one user clicked on
     private highlightedIds: number[] = [] // the ones close to the camera forward position
     private queriedIds: number[] = []  // the ones that contain the word from user input
 
     private tree: kdTree<THREE.Vector3> | undefined
+    private points: THREE.Points | undefined
 
-    public baseColor = new THREE.Color();
-    public queryColor = new THREE.Color(0xad7157)
-    public selectColor = new THREE.Color(0xe3592b)
-    public axesColor = new THREE.Color(0x4f4846)
+    public baseColor = new THREE.Color(0xe6e6e6);
+    public selectColor = new THREE.Color(0xffffff)
+    public neighborColor = new THREE.Color(0x727acf)
+    public axesColor = new THREE.Color(0xe8e8e8)
+
+    public maxTextWidth = 0.10
 
     resources: Resource[] = [
     ]
     queryString: string = '';
-
 
     constructor(private engine: Engine) {
         this.parseCSV().finally(() => {
@@ -69,14 +73,32 @@ export class OniricaInteractive implements Experience {
           document.getElementById('homeIcon')?.addEventListener('click', () => {
               this.engine.camera.reset()
           });
-  
+
+          document.getElementById('toggle')?.addEventListener('click', () => {
+
+            this.textUI.isOriginal = !this.textUI.isOriginal
+            this.updateDreamTexts()
+            
+        });
+
+          this.inactivityManager.addEventListener('inactive', () =>{
+            this.engine.camera.reset();
+            this.resetQuery()
+            this.engine.camera.enableAutorotate = true
+            }
+        );
+
+        this.inactivityManager.addEventListener('active', () =>{
+            this.engine.camera.enableAutorotate = false
+            }
+        )
 
     }
 
     listenForClickEvents() {
         this.engine.raycaster.on('click', (intersections: THREE.Intersection[]) => {
             if (intersections.length > 0) {
-                const instanceId = intersections[0].instanceId ? intersections[0].instanceId : 0;
+                const instanceId = intersections[0].index ? intersections[0].index : 0;
                 this.onDreamSelection(instanceId);
             }
         });
@@ -114,7 +136,7 @@ export class OniricaInteractive implements Experience {
    
     queryDreams() {
         const field = document.getElementById('userInput') as HTMLInputElement;
-        this.updateColouredMesh(this.queriedIds, 0)
+        this.updatePointColor(this.queriedIds, this.baseColor)
         this.textUI.showButtons()
 
         if(field.value == "" || field.value == " ") 
@@ -131,7 +153,7 @@ export class OniricaInteractive implements Experience {
                 const firstQueriedDreamId = this.queriedIds[0];
                 this.selectedId = firstQueriedDreamId;
                 this.engine.camera.animateTo(this.dreams.at(firstQueriedDreamId)!.position);
-                this.updateColouredMesh(this.queriedIds, 1)
+                this.updatePointColor(this.queriedIds, this.neighborColor)
             }
 
             //update tree if dreams to select are less than the total
@@ -145,14 +167,12 @@ export class OniricaInteractive implements Experience {
     resetQuery() {
         //reset tree distance
         this.tree = new kdTree(this.dreams.map(a => a.position), Utils.distance, ["x", "y", "z"]);
-
-        this.updateColouredMesh(this.queriedIds, 0)
+        this.dreamTexts[0].colorRanges = null;
+        this.updatePointColor(this.queriedIds, this.baseColor)
         this.queriedIds = []
         this.queryString = ''
         this.textUI.updateDreamCounter("-1")
         this.updateNearest(this.cameraForwardDistance);
-        this.highlightMesh!.instanceMatrix.needsUpdate = true
-
         }
 
     // Called on resize
@@ -161,15 +181,20 @@ export class OniricaInteractive implements Experience {
     update() {
         if (this.hasCameraChanged() && this.hasCSVLoaded) {
             this.updateNearest(this.cameraForwardDistance)
-        }
+        }    
+    
     }
 
     // Called when dream selection changes
     onDreamSelection(instanceId: number) {
         if (instanceId != this.selectedId) {
-            this.textUI.updateReportText(this.dreams.at(instanceId)!.dreamReport, instanceId.toString());
             this.selectedId = instanceId;
-            this.engine.camera.animateTo(this.dreams.at(instanceId)!.position);
+            const dreamPos : THREE.Vector3 = this.dreams.at(instanceId)!.position;
+            // const YVector = new THREE.Vector3(0.0, 1.0, 0.0);
+            // const perpendicularVector = new THREE.Vector3().crossVectors(this.cameraDir, YVector).normalize();
+            // const newPosition = dreamPos.clone().addScaledVector(perpendicularVector, this.maxTextWidth*0.5);
+
+            this.engine.camera.animateTo(dreamPos);
             this.engine.camera.update();
 
             this.updateDreamTextsOpacity();
@@ -189,32 +214,33 @@ export class OniricaInteractive implements Experience {
 
     updateNearest(stepDistance: number) {
         const futurePos = this.getFuturePosition(stepDistance)
-        this.updateColouredMesh(this.highlightedIds, 0)
+        this.updatePointColor(this.highlightedIds, this.baseColor)
 
         let temp = this.getNearestDreamIndices(this.queryString == '' ? this.dreams : this.dreams. //cycle over all dreams or filter only ones containing query word
             filter((d: Dream) => this.queriedIds.includes(d.id)), futurePos)
         if (temp) {
-            this.highlightedIds = [this.selectedId, ...temp.filter(t => (t != -1 && t != this.selectedId))]
-            this.updatedreamTexts()
-            this.updateColouredMesh(this.highlightedIds, 1)
+            this.highlightedIds = [this.selectedId, ...temp.filter(t => (t != -1 && t != this.selectedId ))]
+
+            this.updateDreamTexts()
+            this.updatePointColor(this.highlightedIds, this.neighborColor)
         }
 
     }
 
-    updateColouredMesh(ids: number[], scale:number) {
+    updatePointColor(ids: number[], color: THREE.Color) {
+        let colorAttribute = this.points?.geometry.getAttribute('color')
         ids.forEach((id:number) => {
-            const matrix = new THREE.Matrix4()
-            matrix.makeScale(scale, scale, scale)
-            matrix.setPosition(this.dreams[id].position);
-            this.highlightMesh?.setMatrixAt(id, matrix);
+            colorAttribute?.setXYZ( id, color.r, color.g, color.b ) 
+
         })
-        this.highlightMesh!.instanceMatrix.needsUpdate = true
+        
+        //@ts-ignore 
+        colorAttribute.needsUpdate = true
     }
 
     hasCameraChanged() {
-        if (this.engine.camera.instance.position.equals(this.cameraPos)) {
-            return false
-        }
+        if (this.engine.camera.instance.position.equals(this.cameraPos)) return false
+
         this.cameraDir = this.engine.camera.instance.getWorldDirection(this.cameraDir).normalize()
         this.cameraPos.copy(this.engine.camera.instance.position)
         return true
@@ -234,28 +260,42 @@ export class OniricaInteractive implements Experience {
         });
     }
 
-    updatedreamTexts() {
+    updateDreamTexts() {
         const cameraDir = this.engine.camera.instance.getWorldDirection(new THREE.Vector3()).normalize();
-        
-        for (let i = 0; i < Math.min(this.highlightedIds.length, this.nneighbors); i++) {
-            const currentDream: Dream = this.dreams[this.highlightedIds[i]]
+        for (let i = 0; i < this.nneighbors; i++) {
             const dreamEntry = this.dreamTexts.at(i);
+
+            if (i < this.highlightedIds.length) {
+                const currentDream: Dream = this.dreams[this.highlightedIds[i]];
+                const text = currentDream.getReport(this.textUI.isOriginal)
+                if (i == 0) {
+                    if (this.queryString != ''){
+                        const startIndex = text.indexOf(this.queryString)
+                        const endIndex = startIndex + this.queryString.length;
+
+                        dreamEntry.colorRanges = {0: 0xfffffff, [startIndex]: 0x2f3bbd, [endIndex]: 0xffffff};
+                    }
+                    //"│───────────────────────────────────────────────────────────────────────────│ \n\n" + 
+                    dreamEntry.text = text;
+                }
+                else {
+                    dreamEntry.text = this.selectDreamContext(text, this.queryString, 15)
+                    dreamEntry.colorRanges = null;
+                }
+        
+                const distance = -this.maxTextWidth*0.5;
+                const distanceY = -0.006;
+                const YVector = new THREE.Vector3(0.0, 1.0, 0.0);
+                const perpendicularVector = new THREE.Vector3().crossVectors(cameraDir, YVector).normalize();
+                const perpendicularVectorY = new THREE.Vector3().crossVectors(perpendicularVector, cameraDir).normalize();
+                const newPosition = currentDream.position.clone().addScaledVector(perpendicularVector, distance).addScaledVector(perpendicularVectorY, distanceY);
+                dreamEntry.position.copy(newPosition);
+                dreamEntry.rotation.setFromRotationMatrix(this.engine.camera.instance.matrixWorld);
+        
+            } else {
+                dreamEntry.text = ""; // reset
+            }
             
-            if (i == 0) dreamEntry.text = currentDream.dreamReport;
-            else{
-            dreamEntry.text = this.selectDreamContext(currentDream.dreamReport, this.queryString, 15)
-
-            }          
-            const distance = 0.007;
-            const distanceY = 0.003;
-            const YVector = new THREE.Vector3(0.0, 1.0, 0.0);
-            const perpendicularVector = new THREE.Vector3().crossVectors(cameraDir, YVector).normalize();
-            const perpendicularVectorY = new THREE.Vector3().crossVectors(perpendicularVector, cameraDir).normalize();
-            const newPosition = currentDream.position.clone().addScaledVector(perpendicularVector, distance).addScaledVector(perpendicularVectorY, distanceY);
-            dreamEntry.position.copy(newPosition);
-            dreamEntry.rotation.setFromRotationMatrix(this.engine.camera.instance.matrixWorld);
-
-            dreamEntry.sync();
         }
 
     }
@@ -306,9 +346,11 @@ export class OniricaInteractive implements Experience {
                         const y = parseFloat(row.y) * scale;
                         const z = parseFloat(row.z) * scale;
                         const dreamReport = String(row.report);
-                        const topics = String(row.keywords)
+                        const dreamReport_es = String(row.report_es);
 
-                        const dream = new Dream(id, x, y, z, dreamReport, topics);
+                        //const topics = String(row.keywords)
+
+                        const dream = new Dream(id, x, y, z, dreamReport, dreamReport_es);
                         this.dreams.push(dream);
 
                     })
@@ -327,57 +369,38 @@ export class OniricaInteractive implements Experience {
             const myText: Text = new Text();
             this.engine.scene.add(myText);
             myText.text = ""
+            myText.textAlign = 'center'
             myText.font = martianMonoRegular;
             myText.fontSize = 0.002;
-            myText.color = this.queryColor;
-            myText.maxWidth = 0.15
+            myText.color = this.baseColor;
+            myText.maxWidth = this.maxTextWidth
             myText.sync();
             this.dreamTexts[i] = myText;   
         }
 
         var geometry = new THREE.BufferGeometry();
-        let vertices = [];
+        let vertices = []
+        let colors = [];
+        let c = new THREE.Color(1, 1, 1);
 
         for (let i = 0; i < this.dreams.length; i++) {
             vertices.push(this.dreams[i].position.x, this.dreams[i].position.y, this.dreams[i].position.z);
+            colors.push(c.r, c.g, c.b );
         }
         
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
         const texture = new THREE.TextureLoader().load('sprite.png' ); 
-        let material = new THREE.PointsMaterial( { size: 0.04, map: texture, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } )
-        let sprites = new THREE.Points(geometry, material);
+        let material = new THREE.PointsMaterial( { size: 0.04, map: texture, vertexColors: true, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } )
+        this.points = new THREE.Points(geometry, material);
 
-
-        // create ghost geometry for raycasting (not rendered)
-        var ghostGeo = new THREE.IcosahedronGeometry(0.006, 1)
-        const ghostMesh = new THREE.InstancedMesh(ghostGeo, new THREE.MeshBasicMaterial(), this.dreams.length);
-        const matrix = new THREE.Matrix4();
-        for (let i = 0; i < this.dreams.length; i++) {
-            matrix.setPosition(this.dreams[i].position);
-            ghostMesh.setMatrixAt(i, matrix);
-        }
-        ghostMesh.matrixWorldNeedsUpdate = true
-
-
-        // create geometry for highlighting queried words
-        const highlightGeo = new THREE.IcosahedronGeometry(0.006, 4)
-
-        this.highlightMesh = new THREE.InstancedMesh(highlightGeo, new THREE.MeshBasicMaterial({color: this.queryColor}), this.dreams.length);
-        for (let i = 0; i < this.dreams.length; i++) {
-            matrix.makeScale(0, 0, 0)
-            matrix.setPosition(this.dreams[i].position);
-            this.highlightMesh.setMatrixAt(i, matrix);
-        }
-        ghostMesh.matrixWorldNeedsUpdate = true
-
-        this.engine.scene.add(sprites, this.highlightMesh);
-        this.engine.raycaster.setIntersectionObjects([ghostMesh])
-
+        this.engine.scene.add(this.points);
+        this.engine.raycaster.setIntersectionObjects([this.points])
 
 
         //add axes
-        const axesHelper = new THREE.AxesHelper(6);
+        const axesHelper = new THREE.AxesHelper(7);
         axesHelper.setColors(this.axesColor, this.axesColor, this.axesColor)
         this.engine.scene.add(axesHelper);
     }
@@ -386,7 +409,7 @@ export class OniricaInteractive implements Experience {
         this.queryString = word;
         const indices: number[] = [];
         dreams.forEach((dream, index) => {
-            if (dream.dreamReport.includes(" " + word + " ")) {
+            if (dream.getReport(this.textUI.isOriginal).includes(" " + word + " ")) {
                 indices.push(index);
             }
         });
