@@ -408,7 +408,7 @@ export class OniricaInteractive implements Experience {
         geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
         const texture = new THREE.TextureLoader().load('sprite.png' ); 
-        let material = new THREE.PointsMaterial( { size: 0.04, map: texture, vertexColors: true, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } )
+        let material = new THREE.PointsMaterial( { size: 0.08, map: texture, vertexColors: true, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } )
         this.points = new THREE.Points(geometry, material);
 
         this.engine.scene.add(this.points);
