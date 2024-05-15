@@ -18,7 +18,8 @@ export class OniricaInteractive implements Experience {
     private cameraForwardDistance: number = 0.5
     private nneighbors: number = 8;
     private textUI: TextUI = new TextUI();
-    private dreams: Dream[] = [];
+    private dreams: Map<number, Dream>;
+    private queriedDreams: Dream[] = []
     private cameraPos: THREE.Vector3 = new THREE.Vector3();
     private cameraDir: THREE.Vector3 = new THREE.Vector3();
     private dreamTexts: Text[] = []; // index 0 + nneighbors
@@ -44,9 +45,10 @@ export class OniricaInteractive implements Experience {
     queryString: string = '';
 
     constructor(private engine: Engine) {
+        this.dreams =  new Map<number, Dream>()
         this.parseCSV().finally(() => {
             this.createScene();
-            this.tree = new kdTree(this.dreams.map(a => a.position), Utils.distance, ["x", "y", "z"]);
+            this.tree = new kdTree( Array.from(this.dreams.values()).map(dream => dream.position), Utils.distance, ["x", "y", "z"]);
             this.hasCSVLoaded = true;
             this.updateNearest(this.cameraForwardDistance)
         });
@@ -138,15 +140,21 @@ export class OniricaInteractive implements Experience {
    
     queryDreams() {
         const field = document.getElementById('userInput') as HTMLInputElement;
-        this.updatePointColor(this.queriedIds, this.baseColor)
-        this.textUI.showButtons()
 
         if(field.value == "" || field.value == " ") 
         {
             this.resetQuery()
             return
         }
-        this.queriedIds = this.search(field.value, this.dreams)
+
+        this.updatePointColor(this.queriedIds, this.baseColor)
+        this.textUI.showButtons()
+
+        const dreamArray = Array.from(this.dreams.values())
+        this.queriedIds = this.search(field.value, dreamArray)
+        const queriedIdsSet = new Set(this.queriedIds);
+        this.queriedDreams = dreamArray.filter((d: Dream) => queriedIdsSet.has(d.id));
+
         this.textUI.updateDreamCounter(this.queriedIds.length.toString())
 
         if (this.queriedIds.length > 0) {
@@ -154,12 +162,16 @@ export class OniricaInteractive implements Experience {
             if (this.queriedIds) {
                 const firstQueriedDreamId = this.queriedIds[0];
                 this.selectedId = firstQueriedDreamId;
-                this.engine.camera.animateTo(this.dreams.at(firstQueriedDreamId)!.position);
+                this.engine.camera.animateTo(this.dreams!.get(firstQueriedDreamId)!.position);
                 this.updatePointColor(this.queriedIds, this.neighborColor)
             }
 
             //update tree if dreams to select are less than the total
-            this.tree = new kdTree(this.dreams.filter(d => this.queriedIds.includes(d.id)).map(a => a.position), Utils.distance, ["x", "y", "z"]);
+            const queriedIdsSet = new Set(this.queriedIds);
+            const filteredPositions = dreamArray
+                               .filter(d => queriedIdsSet.has(d.id))
+                               .map(d => d.position);
+            this.tree = new kdTree(filteredPositions, Utils.distance, ["x", "y", "z"]);
 
             
             this.updateNearest(this.cameraForwardDistance);
@@ -168,7 +180,7 @@ export class OniricaInteractive implements Experience {
     }
     resetQuery() {
         //reset tree distance
-        this.tree = new kdTree(this.dreams.map(a => a.position), Utils.distance, ["x", "y", "z"]);
+        this.tree = new kdTree(Array.from(this.dreams.values()).map(dream => dream.position), Utils.distance, ["x", "y", "z"]);
         this.dreamTexts[0].colorRanges = null;
         this.updatePointColor(this.queriedIds, this.baseColor)
         this.queriedIds = []
@@ -191,7 +203,7 @@ export class OniricaInteractive implements Experience {
     onDreamSelection(instanceId: number) {
         if (instanceId != this.selectedId) {
             this.selectedId = instanceId;
-            const dreamPos : THREE.Vector3 = this.dreams.at(instanceId)!.position;
+            const dreamPos : THREE.Vector3 = this.dreams.get(instanceId)!.position;
             // const YVector = new THREE.Vector3(0.0, 1.0, 0.0);
             // const perpendicularVector = new THREE.Vector3().crossVectors(this.cameraDir, YVector).normalize();
             // const newPosition = dreamPos.clone().addScaledVector(perpendicularVector, this.maxTextWidth*0.5);
@@ -217,9 +229,11 @@ export class OniricaInteractive implements Experience {
     updateNearest(stepDistance: number) {
         const futurePos = this.getFuturePosition(stepDistance)
         this.updatePointColor(this.highlightedIds, this.baseColor)
+        const relevantDreams = this.queryString === '' ? 
+            Array.from(this.dreams.values()) : 
+            this.queriedDreams
 
-        let temp = this.getNearestDreamIndices(this.queryString == '' ? this.dreams : this.dreams. //cycle over all dreams or filter only ones containing query word
-            filter((d: Dream) => this.queriedIds.includes(d.id)), futurePos)
+        let temp = this.getNearestDreamIndices(relevantDreams, futurePos);
         if (temp) {
             this.highlightedIds = [this.selectedId, ...temp.filter(t => (t != -1 && t != this.selectedId ))]
 
@@ -241,11 +255,11 @@ export class OniricaInteractive implements Experience {
     }
 
     hasCameraChanged() {
-        if (this.engine.camera.instance.position.equals(this.cameraPos)) return false
-
-        this.cameraDir = this.engine.camera.instance.getWorldDirection(this.cameraDir).normalize()
-        this.cameraPos.copy(this.engine.camera.instance.position)
-        return true
+        if (this.engine.camera.instance.position.equals(this.cameraPos)) return false;
+        
+        this.cameraDir = this.engine.camera.instance.getWorldDirection(this.cameraDir).normalize();
+        this.cameraPos.copy(this.engine.camera.instance.position);
+        return true;
     }
 
     updateCameraValues() {
@@ -258,7 +272,7 @@ export class OniricaInteractive implements Experience {
 
     getNearestDreamIndices(dreams: Dream[], futurePos: THREE.Vector3) {
         return this.tree!.nearest(futurePos, Math.min(dreams.length, this.nneighbors-1))?.map((p: any) => {
-            return this.dreams.map(d => d.position).indexOf(p[0])
+            return Array.from(this.dreams.values()).map(dream => dream.position).indexOf(p[0])
         });
     }
 
@@ -270,14 +284,10 @@ export class OniricaInteractive implements Experience {
             const dreamEntry = this.dreamTexts.at(i);
 
             if (i < this.highlightedIds.length) {
-                const currentDream: Dream = this.dreams[this.highlightedIds[i]];
+                const currentDream: Dream = this.dreams.get(this.highlightedIds[i])!;
                 const text = currentDream.getReport(this.textUI.isOriginal)
                 if (i == 0) {
                     if (this.queryString != ''){
-                        // const startIndex = text.indexOf(this.queryString)
-                        // const endIndex = startIndex + this.queryString.length + 1;
-
-                        // Use the search method to find the index of the first match
                         const index = text.search(regex);
                         dreamEntry.colorRanges = {0: 0xfffffff, [index]: 0x2f3bbd, [index+this.queryString.length]: 0xffffff};
                     }
@@ -357,7 +367,7 @@ export class OniricaInteractive implements Experience {
                         //const topics = String(row.keywords)
 
                         const dream = new Dream(id, x, y, z, dreamReport, dreamReport_es);
-                        this.dreams.push(dream);
+                        this.dreams?.set(id, dream);
 
                     })
                 },
@@ -389,8 +399,8 @@ export class OniricaInteractive implements Experience {
         let colors = [];
         let c = new THREE.Color(1, 1, 1);
 
-        for (let i = 0; i < this.dreams.length; i++) {
-            vertices.push(this.dreams[i].position.x, this.dreams[i].position.y, this.dreams[i].position.z);
+        for (let i = 0; i < this.dreams?.size!; i++) {
+            vertices.push(this.dreams?.get(i)?.position.x, this.dreams?.get(i)?.position.y, this.dreams?.get(i)?.position.z);
             colors.push(c.r, c.g, c.b );
         }
         
