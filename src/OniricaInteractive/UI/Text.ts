@@ -12,7 +12,7 @@ export type TextConfig = {
 export class TextUI {
   private container!: HTMLDivElement;
   private keyboard: Keyboard 
-  public isOriginal: boolean = true
+  public isOriginal: boolean = false
 
   constructor(config: TextConfig = {}) {
     if (config.documentTitle) {
@@ -28,7 +28,7 @@ export class TextUI {
         <div id="searchIcon" class='search-icon'>
           <i class="fa-solid fa-magnifying-glass"></i>
         </div>
-        <input id="userInput" class="input" inputmode='none'>
+        <input id="userInput" class="input" inputmode='none' role="presentation" autocomplete="off" >
         <div id="crossIcon" class='cross-icon'>
           <i class="fa-solid fa-x"></i>
         </div>
@@ -55,8 +55,9 @@ export class TextUI {
     `
     <input type="checkbox" id="toggle" class="toggleCheckbox" />
     <label for="toggle" class="toggleContainer">
-      <div>Original</div>   
     <div>Traducción</div>
+    <div>Original</div>   
+
     </label>
     `
     )
@@ -128,10 +129,10 @@ export class TextUI {
     document.getElementById("userInput")!.addEventListener('focus', function() {
       document.getElementById("keyboardContainer")?.classList.remove("hidden");
     });
-    document.getElementById("userInput")!.addEventListener('focusout', function() {
-      document.getElementById("keyboardContainer")?.classList.add("hidden");
-      console.log('out')
-    });
+    // document.getElementById("userInput")!.addEventListener('focusout', function() {
+    //   document.getElementById("keyboardContainer")?.classList.add("hidden");
+    //   console.log('out')
+    // });
 
     document.getElementById("keyboardContainer")!.addEventListener('blur', function() {
       document.getElementById("keyboardContainer")?.classList.add("hidden");

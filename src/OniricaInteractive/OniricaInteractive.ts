@@ -68,6 +68,8 @@ export class OniricaInteractive implements Experience {
             if (inputElement) inputElement.value = "";
             this.textUI.resetKeyboard()
             this.resetQuery()
+            document.getElementById("keyboardContainer")?.classList.add("hidden");
+
           })
 
           document.getElementById('homeIcon')?.addEventListener('click', () => {
@@ -262,6 +264,8 @@ export class OniricaInteractive implements Experience {
 
     updateDreamTexts() {
         const cameraDir = this.engine.camera.instance.getWorldDirection(new THREE.Vector3()).normalize();
+        const regex = new RegExp(`\\b${this.queryString}\\b`, 'gi');
+
         for (let i = 0; i < this.nneighbors; i++) {
             const dreamEntry = this.dreamTexts.at(i);
 
@@ -270,10 +274,12 @@ export class OniricaInteractive implements Experience {
                 const text = currentDream.getReport(this.textUI.isOriginal)
                 if (i == 0) {
                     if (this.queryString != ''){
-                        const startIndex = text.indexOf(this.queryString)
-                        const endIndex = startIndex + this.queryString.length;
+                        // const startIndex = text.indexOf(this.queryString)
+                        // const endIndex = startIndex + this.queryString.length + 1;
 
-                        dreamEntry.colorRanges = {0: 0xfffffff, [startIndex]: 0x2f3bbd, [endIndex]: 0xffffff};
+                        // Use the search method to find the index of the first match
+                        const index = text.search(regex);
+                        dreamEntry.colorRanges = {0: 0xfffffff, [index]: 0x2f3bbd, [index+this.queryString.length]: 0xffffff};
                     }
                     //"│───────────────────────────────────────────────────────────────────────────│ \n\n" + 
                     dreamEntry.text = text;
@@ -345,8 +351,8 @@ export class OniricaInteractive implements Experience {
                         const x = parseFloat(row.x) * scale;
                         const y = parseFloat(row.y) * scale;
                         const z = parseFloat(row.z) * scale;
-                        const dreamReport = String(row.report);
-                        const dreamReport_es = String(row.report_es);
+                        const dreamReport = String(row.report).replace(/(\r\n|\n|\r)/gm,"").replace(/[^\x00-\x7F]/, "");
+                        const dreamReport_es = String(row.report_es).replace(/(\r\n|\n|\r)/gm,"").replace(/[^\x00-\x7F]/, "");
 
                         //const topics = String(row.keywords)
 
@@ -409,10 +415,14 @@ export class OniricaInteractive implements Experience {
         this.queryString = word;
         const indices: number[] = [];
         dreams.forEach((dream, index) => {
-            if (dream.getReport(this.textUI.isOriginal).includes(" " + word + " ")) {
+            let regex = new RegExp(`\\b${word.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`);
+
+            if (regex.test(dream.getReport(this.textUI.isOriginal))) {
+
                 indices.push(index);
             }
         });
+
         return indices;
     }
 
