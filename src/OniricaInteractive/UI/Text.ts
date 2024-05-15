@@ -21,11 +21,10 @@ export class TextUI {
 
     this.container = document.createElement('div');
     this.container.classList.add('text-container');
-    this.container.prepend
     this.container.insertAdjacentHTML(
       'beforeend',
       `
-      <div class="searchBar">
+     <div class="searchBar">
         <div id="searchIcon" class='search-icon'>
           <i class="fa-solid fa-magnifying-glass"></i>
         </div>
@@ -34,23 +33,35 @@ export class TextUI {
           <i class="fa-solid fa-x"></i>
         </div>
       </div> 
-      <div id="homeIcon" class='home-icon'>
-      <i class="fas fa-home"></i> 
-      </div>
-      <div id="langIcon">
-      <input type="checkbox" id="toggle" class="toggleCheckbox" />
-      <label for="toggle" class="toggleContainer">
-        <div>Original</div>   
-      <div>Traducción</div>
-      </label>
-      </div>
-
 
       <div id="keyboardContainer" class="keyboardContainer hidden">
         <div class="simple-keyboard"></div>
       </div>
       `
     );
+
+    let homeIcon = document.createElement('div');
+    homeIcon.insertAdjacentHTML('beforeend',
+    `
+    <div id="homeIcon" class='home-icon'>
+    <i class="fas fa-home"></i> 
+    </div>
+    `
+    )
+    document.body.prepend(homeIcon)
+
+    let langIcon = document.createElement('div')
+    langIcon.insertAdjacentHTML('beforeend',
+    `
+    <input type="checkbox" id="toggle" class="toggleCheckbox" />
+    <label for="toggle" class="toggleContainer">
+      <div>Original</div>   
+    <div>Traducción</div>
+    </label>
+    `
+    )
+    document.body.append(langIcon)
+
 
     document.body.prepend(this.container);
     const topbar = document.createElement('div');
@@ -121,7 +132,6 @@ export class TextUI {
       document.getElementById("keyboardContainer")?.classList.add("hidden");
       console.log('out')
     });
-
 
     document.getElementById("keyboardContainer")!.addEventListener('blur', function() {
       document.getElementById("keyboardContainer")?.classList.add("hidden");

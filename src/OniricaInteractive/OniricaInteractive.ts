@@ -35,7 +35,7 @@ export class OniricaInteractive implements Experience {
     public baseColor = new THREE.Color(0xe6e6e6);
     public selectColor = new THREE.Color(0xffffff)
     public neighborColor = new THREE.Color(0x727acf)
-    public axesColor = new THREE.Color(0x4f4846)
+    public axesColor = new THREE.Color(0xe8e8e8)
 
     public maxTextWidth = 0.10
 
@@ -400,7 +400,7 @@ export class OniricaInteractive implements Experience {
 
 
         //add axes
-        const axesHelper = new THREE.AxesHelper(6);
+        const axesHelper = new THREE.AxesHelper(7);
         axesHelper.setColors(this.axesColor, this.axesColor, this.axesColor)
         this.engine.scene.add(axesHelper);
     }
