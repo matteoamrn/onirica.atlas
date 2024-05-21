@@ -1,6 +1,6 @@
 .text-container {
   position: fixed;
-  width: 50%;
+  width: 66%;
   bottom: 4%;
   left: 50%;
   transform: translateX(-50%);
@@ -65,7 +65,6 @@
   right: 2.5%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  width: fit-content;
   border: 1px solid rgb(175, 175, 175);
   border-radius: 20px;
   background: #52525200;
@@ -73,7 +72,7 @@
   font-size:11px;
   cursor: pointer;
 
-  width: 16%; /* Initial width */
+  width: 10%; /* Initial width */
   height: 40px; /* Initial height */
   display: flex;
   justify-content:space-around;
@@ -196,7 +195,7 @@
 
 #dreamCount:after {
   content: attr(data-last-word);
-  color: #727acf;
+  color: #ff0000;
   font-family: 'MartianMonoBold';
   position: relative;
   top: 0;

@@ -5,13 +5,13 @@ import layout from "simple-keyboard-layouts/build/layouts/spanish";
 
 export type TextConfig = {
   title?: string
-  report?:string
+  report?: string
   documentTitle?: string
 }
 
 export class TextUI {
   private container!: HTMLDivElement;
-  private keyboard: Keyboard 
+  private keyboard: Keyboard
   public isOriginal: boolean = false
 
   constructor(config: TextConfig = {}) {
@@ -42,7 +42,7 @@ export class TextUI {
 
     let homeIcon = document.createElement('div');
     homeIcon.insertAdjacentHTML('beforeend',
-    `
+      `
     <div id="homeIcon" class='home-icon'>
     <i class="fas fa-home"></i> 
     </div>
@@ -52,7 +52,7 @@ export class TextUI {
 
     let langIcon = document.createElement('div')
     langIcon.insertAdjacentHTML('beforeend',
-    `
+      `
     <input type="checkbox" id="toggle" class="toggleCheckbox" />
     <label for="toggle" class="toggleContainer">
     <div>Traducción</div>
@@ -87,7 +87,7 @@ export class TextUI {
 
     const buttonNext = document.createElement('button');
     buttonNext.id = 'button-next';
-    buttonNext.classList.add('button-next' ,'btn', 'hidden');
+    buttonNext.classList.add('button-next', 'btn', 'hidden');
     buttonNext.textContent = '>';
 
     document.body.appendChild(buttonPrevious);
@@ -103,96 +103,123 @@ export class TextUI {
       onChange: input => {
         const inputElement = document.getElementById("userInput") as HTMLInputElement;
         inputElement.value = input
-  
+
       },
       onKeyPress: button => {
         if (button === "{shift}" || button === "{lock}") {
           let currentLayout = this.keyboard.options.layoutName;
           let shiftToggle = currentLayout === "default" ? "shift" : "default";
-        
+
           this.keyboard.setOptions({
             layoutName: shiftToggle
           });
-      }
-      if (button === "{enter}") {
-        document.getElementById('searchIcon')?.click()
-     }
+        }
+        if (button === "{enter}") {
+          document.getElementById('searchIcon')?.click()
+        }
 
       }
     });
-                  
+
 
     document.getElementById("keyboardContainer")?.classList.add("hidden");
     const search = document.getElementById('searchIcon') as HTMLButtonElement;
     search.click()
 
-    document.getElementById("userInput")!.addEventListener('focus', function() {
+    document.getElementById("userInput")!.addEventListener('focus', function () {
       document.getElementById("keyboardContainer")?.classList.remove("hidden");
     });
-    // document.getElementById("userInput")!.addEventListener('focusout', function() {
-    //   document.getElementById("keyboardContainer")?.classList.add("hidden");
-    //   console.log('out')
-    // });
 
-    document.getElementById("keyboardContainer")!.addEventListener('blur', function() {
+    document.getElementById("keyboardContainer")!.addEventListener('blur', function () {
       document.getElementById("keyboardContainer")?.classList.add("hidden");
     });
 
-    document.getElementById("keyboardContainer")!.addEventListener('blur', function() {
+    document.getElementById("keyboardContainer")!.addEventListener('blur', function () {
       document.getElementById("keyboardContainer")?.classList.add("hidden");
     });
 
 
-    
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const userInput = document.getElementById('userInput');
+      const keyboard = document.getElementById('keyboardContainer');
+      const textContainer = document.querySelector('.text-container');
+
+      function showKeyboard() {
+        keyboard?.classList.remove("hidden");
+      }
+
+      function hideKeyboard() {
+        keyboard!.classList.add('hidden');
+      }
+
+      userInput!.addEventListener('focus', showKeyboard);
+
+
+      document.addEventListener('click',  (event:any) => {
+
+        if (!textContainer!.contains(event.target)) {
+          hideKeyboard();
+        } else if (keyboard!.contains(event.target)) {
+          showKeyboard();
+        }
+
+      });
+
+    });
+
+
   }
 
 
-  updateReportText(newText: string, dreamId:string) {
+  updateReportText(newText: string, dreamId: string) {
     const reportTextElement = this.container.querySelector('.scrollable-text') as HTMLTextAreaElement;
     if (reportTextElement) {
       reportTextElement.value = 'Dream #' + dreamId + '\n' + '\n' + '\n' + '(' + '\n' + '\n' + newText + '\n' + '\n' + ')';
     }
   }
-  
+
   updateDreamCounter(ndreams: string) {
     const text = document.getElementById("dreamCount");
 
-    if (ndreams == "-1")  
-    {
+    if (ndreams == "-1") {
       text!.textContent = '';
       text!.removeAttribute('data-last-word')
       return
     }
-    else if (ndreams == "0"){
+    else if (ndreams == "0") {
       const userInput = document.getElementById('userInput') as HTMLInputElement;
       const lastWord = userInput.value;
-      text!.textContent = "No dreams found containing the word: " ;
+      var s = this.isOriginal ? 'No dreams found talking about ' : 'No sueños hablan de '
+      text!.textContent = s;
+
       text!.setAttribute('data-last-word', lastWord);
       return
     }
     const userInput = document.getElementById('userInput') as HTMLInputElement;
     const lastWord = userInput.value;
-    text!.textContent = ndreams + ' dreams are talking about ';
+    var s = this.isOriginal ? ndreams + ' dreams are talking about ' : ndreams + ' sueños hablan de '
+    text!.textContent = s;
     text!.setAttribute('data-last-word', lastWord);
   }
 
-  resetKeyboard(){
+  resetKeyboard() {
     this.keyboard!.clearInput()
     this.hideButtons()
   }
 
-  showButtons(){
+  showButtons() {
     const buttonPrevious = document.getElementById('button-previous');
     buttonPrevious?.classList.remove('hidden');
-    const buttonNext= document.getElementById('button-next');
+    const buttonNext = document.getElementById('button-next');
     buttonNext?.classList.remove('hidden');
 
   }
 
-  hideButtons(){
+  hideButtons() {
     const buttonPrevious = document.getElementById('button-previous');
     buttonPrevious?.classList.add('hidden');
-    const buttonNext= document.getElementById('button-next');
+    const buttonNext = document.getElementById('button-next');
     buttonNext?.classList.add('hidden');
 
   }
