@@ -34,7 +34,7 @@ export class OniricaInteractive implements Experience {
 
     public baseColor = new THREE.Color(0xe6e6e6);
     public selectColor = new THREE.Color(0xffffff)
-    public neighborColor = new THREE.Color(0x6ca96d)
+    public neighborColor = new THREE.Color(0xd00000)
     public axesColor = new THREE.Color(0xe4e4e4)
 
     public maxTextWidth = 0.10
@@ -199,7 +199,7 @@ export class OniricaInteractive implements Experience {
 
     // Called when dream selection changes
     onDreamSelection(instanceId: number) {
-        if (instanceId != this.selectedId) {
+        if (instanceId != this.selectedId ) {
             this.selectedId = instanceId;
             const dreamPos: THREE.Vector3 = this.dreams.get(instanceId)!.position;
             this.engine.camera.animateTo(dreamPos);
@@ -230,16 +230,20 @@ export class OniricaInteractive implements Experience {
 
         let temp = this.getNearestDreamIndices(relevantDreams, futurePos);
         if (temp) {
-            this.highlightedIds = [this.selectedId, ...temp.filter(t => (t != -1 && t != this.selectedId))]
-
+            this.highlightedIds = [
+                this.selectedId,
+                ...temp.filter(t => t !== -1 && t !== this.selectedId)
+            ];
             this.updateDreamTexts()
+            if (this.queryString != '' && !this.queriedIds.includes(this.selectedId)) this.highlightedIds = this.highlightedIds.filter((n:number) => n != this.selectedId)
+
             this.updatePointColor(this.highlightedIds, this.neighborColor)
         }
 
     }
 
     updatePointColor(ids: number[], color: THREE.Color) {
-        let colorAttribute = this.points?.geometry.getAttribute('color')
+        let colorAttribute = this.points?.geometry.getAttribute('color');
         ids.forEach((id: number) => {
             colorAttribute?.setXYZ(id, color.r, color.g, color.b)
 
@@ -286,7 +290,6 @@ export class OniricaInteractive implements Experience {
                         const index = this.normalizeString(text).search(regex);
                         dreamEntry!.textMesh.colorRanges = { 0: 0xfffffff, [index]: this.neighborColor, [index + this.queryString.length + 1]: 0xffffff };
                     }
-                    //"│───────────────────────────────────────────────────────────────────────────│ \n\n" + 
                     dreamEntry?.updateText(text)
                 }
                 else {
@@ -383,7 +386,7 @@ export class OniricaInteractive implements Experience {
     var geometry = new THREE.BufferGeometry();
     let vertices = []
     let colors = [];
-    let c = new THREE.Color(1, 1, 1);
+    let c = new THREE.Color(0.9, 0.9, 0.9);
 
     for (let i = 0; i < this.dreams?.size!; i++) {
         vertices.push(this.dreams.get(i)!.position.x, this.dreams.get(i)!.position.y, this.dreams.get(i)!.position.z);
