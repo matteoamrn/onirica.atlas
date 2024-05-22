@@ -35,7 +35,7 @@ export class TroikaText {
     }
 
 
-    updateText(newText: string, options: Partial<Text> = {}) {
+    updateText(newText: string, _options: Partial<Text> = {}) {
         this.textMesh.text = newText;
 
         this.textMesh.sync(() => {

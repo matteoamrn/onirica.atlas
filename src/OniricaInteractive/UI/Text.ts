@@ -190,7 +190,7 @@ export class TextUI {
     else if (ndreams == "0") {
       const userInput = document.getElementById('userInput') as HTMLInputElement;
       const lastWord = userInput.value;
-      var s = this.isOriginal ? 'No dreams found talking about ' : 'No sueños hablan de '
+      var s = this.isOriginal ? 'No dreams found talking about ' : 'Ningún sueño habla de '
       text!.textContent = s;
 
       text!.setAttribute('data-last-word', lastWord);
