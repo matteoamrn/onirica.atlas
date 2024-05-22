@@ -55,8 +55,8 @@ export class TextUI {
       `
     <input type="checkbox" id="toggle" class="toggleCheckbox" />
     <label for="toggle" class="toggleContainer">
-    <div>Traducción</div>
-    <div>Original</div>   
+    <div>ESP</div>
+    <div>ENG</div>   
 
     </label>
     `
