@@ -14,7 +14,7 @@ export class Camera implements GameEntity {
 
   private initPos = new THREE.Vector3(2, 5, 13);
   private cameraWorldDir: THREE.Vector3 = new THREE.Vector3(0)
-  public enableAutorotate:boolean = false;
+  public enableAutorotate:boolean = true;
 
   constructor(private engine: Engine) {
     this.initCamera()

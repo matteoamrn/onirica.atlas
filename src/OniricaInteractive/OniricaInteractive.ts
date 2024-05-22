@@ -5,13 +5,12 @@ import { Resource } from '../engine/Resources'
 import { Dream } from './Dream';
 import Papa from 'papaparse';
 import { TextUI } from './UI/Text';
-// @ts-ignore
-import { Text, getSelectionRects } from 'troika-three-text'
 import { kdTree } from 'kd-tree-javascript'
 import gsap from 'gsap'
 import Utils from './Utils'
-import martianMonoRegular from '../../assets/fonts/MartianMono-Regular.ttf'
 import InactivityTracker from './InactivityTracker';
+
+import { TroikaText } from './TroikaText';
 
 export class OniricaInteractive implements Experience {
     private hasCSVLoaded: boolean = false;
@@ -22,7 +21,7 @@ export class OniricaInteractive implements Experience {
     private queriedDreams: Dream[] = []
     private cameraPos: THREE.Vector3 = new THREE.Vector3();
     private cameraDir: THREE.Vector3 = new THREE.Vector3();
-    private dreamTexts: Text[] = []; // index 0 + nneighbors
+    private dreamTexts: TroikaText[] = []; // index 0 + nneighbors
 
     private inactivityManager: InactivityTracker = InactivityTracker.getInstance()
 
@@ -35,14 +34,15 @@ export class OniricaInteractive implements Experience {
 
     public baseColor = new THREE.Color(0xe6e6e6);
     public selectColor = new THREE.Color(0xffffff)
-    public neighborColor = new THREE.Color(0xff0000)
-    public axesColor = new THREE.Color(0xe8e8e8)
+    public neighborColor = new THREE.Color(0x6ca96d)
+    public axesColor = new THREE.Color(0xe4e4e4)
 
     public maxTextWidth = 0.10
 
     resources: Resource[] = [
     ]
     queryString: string = '';
+    backgroundMesh: any;
 
     constructor(private engine: Engine) {
         this.dreams = new Map<number, Dream>()
@@ -149,7 +149,7 @@ export class OniricaInteractive implements Experience {
         this.textUI.showButtons()
 
         const dreamArray = Array.from(this.dreams.values())
-        this.queriedIds = this.search(field.value, dreamArray)
+        this.queriedIds = this.search(field.value.trim(), dreamArray)
         const queriedIdsSet = new Set(this.queriedIds);
         this.queriedDreams = dreamArray.filter((d: Dream) => queriedIdsSet.has(d.id));
 
@@ -179,7 +179,7 @@ export class OniricaInteractive implements Experience {
     resetQuery() {
         //reset tree distance
         this.tree = new kdTree(Array.from(this.dreams.values()).map(dream => dream.position), Utils.distance, ["x", "y", "z"]);
-        this.dreamTexts[0].colorRanges = null;
+        this.dreamTexts[0].textMesh.colorRanges = null;
         this.updatePointColor(this.queriedIds, this.baseColor)
         this.queriedIds = []
         this.queryString = ''
@@ -202,24 +202,18 @@ export class OniricaInteractive implements Experience {
         if (instanceId != this.selectedId) {
             this.selectedId = instanceId;
             const dreamPos: THREE.Vector3 = this.dreams.get(instanceId)!.position;
-            // const YVector = new THREE.Vector3(0.0, 1.0, 0.0);
-            // const perpendicularVector = new THREE.Vector3().crossVectors(this.cameraDir, YVector).normalize();
-            // const newPosition = dreamPos.clone().addScaledVector(perpendicularVector, this.maxTextWidth*0.5);
-
             this.engine.camera.animateTo(dreamPos);
             this.engine.camera.update();
-
             this.updateDreamTextsOpacity();
-            //this.updateButtons();
         }
     }
 
     // Update dream text opacity with animation
     updateDreamTextsOpacity() {
-        this.dreamTexts.forEach((t: Text, i: number) => {
-            t.fillOpacity = 0
+        this.dreamTexts.forEach((t: TroikaText, i: number) => {
+            t.textMesh.fillOpacity = 0
             let opacity = (i == 0) ? 1 : 0.15;
-            gsap.to(t, { fillOpacity: opacity, ease: "expo.in", duration: 2.5 })
+            gsap.to(t.textMesh, { fillOpacity: opacity, ease: "expo.in", duration: 3.5 })
         });
     }
 
@@ -281,8 +275,6 @@ export class OniricaInteractive implements Experience {
     updateDreamTexts() {
         const cameraDir = this.engine.camera.instance.getWorldDirection(new THREE.Vector3()).normalize();
         let escapedWord = this.queryString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-
-        
         let regex = new RegExp(`(^|[^\\p{L}\\p{N}])${escapedWord}($|[^\\p{L}\\p{N}])`, 'gu');
         
         for (let i = 0; i < this.nneighbors; i++) {
@@ -294,27 +286,20 @@ export class OniricaInteractive implements Experience {
                 if (i == 0) {
                     if (this.queryString != '') {
                         const index = text.search(regex);
-                        dreamEntry.colorRanges = { 0: 0xfffffff, [index]: this.neighborColor, [index + this.queryString.length + 1]: 0xffffff };
+                        dreamEntry!.textMesh.colorRanges = { 0: 0xfffffff, [index]: this.neighborColor, [index + this.queryString.length + 1]: 0xffffff };
                     }
                     //"│───────────────────────────────────────────────────────────────────────────│ \n\n" + 
-                    dreamEntry.text = text;
+                    dreamEntry?.updateText(text)
                 }
                 else {
-                    dreamEntry.text = this.selectDreamContext(text, this.queryString, 15)
-                    dreamEntry.colorRanges = null;
+                    dreamEntry?.updateText(this.selectDreamContext(text, this.queryString, 15))
+                    dreamEntry!.textMesh.colorRanges = null;
                 }
 
-                const distance = -this.maxTextWidth * 0.5;
-                const distanceY = -0.006;
-                const YVector = new THREE.Vector3(0.0, 1.0, 0.0);
-                const perpendicularVector = new THREE.Vector3().crossVectors(cameraDir, YVector).normalize();
-                const perpendicularVectorY = new THREE.Vector3().crossVectors(perpendicularVector, cameraDir).normalize();
-                const newPosition = currentDream.position.clone().addScaledVector(perpendicularVector, distance).addScaledVector(perpendicularVectorY, distanceY);
-                dreamEntry.position.copy(newPosition);
-                dreamEntry.rotation.setFromRotationMatrix(this.engine.camera.instance.matrixWorld);
+                dreamEntry?.updatePosition(cameraDir, currentDream.position.clone(), this.engine.camera.instance.matrixWorld)
 
             } else {
-                dreamEntry.text = ""; // reset
+                dreamEntry?.updateText("") // reset
             }
 
         }
@@ -387,27 +372,25 @@ export class OniricaInteractive implements Experience {
         this.dreamTexts = new Array(this.nneighbors).fill(null);
         //create texts
         for (let i = 0; i < this.nneighbors; i++) {
-            const myText: Text = new Text();
-            this.engine.scene.add(myText);
-            myText.text = ""
-            myText.textAlign = 'center'
-            myText.font = martianMonoRegular;
-            myText.fontSize = 0.002;
-            myText.color = this.baseColor;
-            myText.maxWidth = this.maxTextWidth
-            myText.sync();
+            const myText: TroikaText = new TroikaText(this.engine.scene,{
+                fontSize: 0.002, 
+                color: this.baseColor, 
+                maxTextWidth: this.maxTextWidth,
+                backgroundColor: 'yellow' 
+            });
             this.dreamTexts[i] = myText;
         }
 
-        var geometry = new THREE.BufferGeometry();
-        let vertices = []
-        let colors = [];
-        let c = new THREE.Color(1, 1, 1);
 
-        for (let i = 0; i < this.dreams?.size!; i++) {
-            vertices.push(this.dreams.get(i)!.position.x, this.dreams.get(i)!.position.y, this.dreams.get(i)!.position.z);
-            colors.push(c.r, c.g, c.b);
-        }
+    var geometry = new THREE.BufferGeometry();
+    let vertices = []
+    let colors = [];
+    let c = new THREE.Color(1, 1, 1);
+
+    for (let i = 0; i < this.dreams?.size!; i++) {
+        vertices.push(this.dreams.get(i)!.position.x, this.dreams.get(i)!.position.y, this.dreams.get(i)!.position.z);
+        colors.push(c.r, c.g, c.b);
+    }
 
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
@@ -432,7 +415,6 @@ export class OniricaInteractive implements Experience {
         dreams.forEach((dream, index) => {
             let escapedWord = this.queryString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 
-        
             let regex = new RegExp(`(^|[^\\p{L}\\p{N}])${escapedWord}($|[^\\p{L}\\p{N}])`, 'gu');
     
             if (regex.test(dream.getReport(this.textUI.isOriginal))) {

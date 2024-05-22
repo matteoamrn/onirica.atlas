@@ -29,7 +29,7 @@
 
 .home-icon {
   position: absolute;
-  bottom: 3%;
+  bottom: 4%;
   left: 2.5%;
   padding: 10px;
   border-radius: 40px; /* Set to 0 for sharp edges */
@@ -44,14 +44,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 70px; /* Initial width */
-  height: 70px; /* Initial height */
+  width: 40px; /* Initial width */
+  height: 40px; /* Initial height */
   border: 2px solid black;
 
 }
 
 .home-icon i {
-  font-size: 24px; /* Adjust the size as needed */
+  font-size: 16px; /* Adjust the size as needed */
 }
 
 
@@ -63,22 +63,21 @@
   position: absolute;
   bottom: 4%;
   right: 2.5%;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
   border: 1px solid rgb(175, 175, 175);
   border-radius: 20px;
   background: #52525200;
   font-family: 'MartianMonoBold';
-  font-size:11px;
+  font-size:10px;
   cursor: pointer;
 
   width: 10%; /* Initial width */
   height: 40px; /* Initial height */
   display: flex;
-  justify-content:space-around;
+  justify-content:center;
   align-items: center;
 
 }
+
 
 .toggleContainer::before {
   content: '';
@@ -94,6 +93,7 @@
 .toggleContainer div {
   padding: 6px;
   text-align: center;
+  flex: 1;
   z-index: 1;
 }
 
@@ -195,7 +195,7 @@
 
 #dreamCount:after {
   content: attr(data-last-word);
-  color: #ff0000;
+  color: #6ca96d;
   font-family: 'MartianMonoBold';
   position: relative;
   top: 0;
@@ -237,19 +237,6 @@
   border: 1px solid rgba(0, 0, 0, 0);
 }
 
-// .button-container .button-others:hover {
-//   background-color: rgb(32, 32, 32);
-// }
-
-// .button-container .button-others.left {
-//   margin-left: 1px;
-// }
-
-// .button-container .button-others.right {
-//   margin-right: 10px;
-// }
-
-
 .simple-keyboard.blackTheme {
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: 0;
@@ -264,13 +251,4 @@
   align-items: center;
   background: rgba(0, 0, 0, 0.5);
   color: rgb(175, 175, 175);
-}
-
-.simple-keyboard.blackTheme .hg-button:active {
-  background: #1c4995;
-  color: rgb(175, 175, 175);
-}
-
-#root .simple-keyboard.blackTheme + .simple-keyboard-preview {
-  background: #1c4995;
 }
