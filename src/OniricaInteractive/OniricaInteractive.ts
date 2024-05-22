@@ -212,8 +212,11 @@ export class OniricaInteractive implements Experience {
     updateDreamTextsOpacity() {
         this.dreamTexts.forEach((t: TroikaText, i: number) => {
             t.textMesh.fillOpacity = 0
+            t.textMesh.outlineOpacity = 0
             let opacity = (i == 0) ? 1 : 0.15;
+            gsap.to(t.textMesh, { outlineOpacity: 1, ease: "expo.in", duration: 3.5 })
             gsap.to(t.textMesh, { fillOpacity: opacity, ease: "expo.in", duration: 3.5 })
+
         });
     }
 
@@ -267,25 +270,20 @@ export class OniricaInteractive implements Experience {
             return Array.from(this.dreams.values()).map(dream => dream.position).indexOf(p[0])
         });
     }
-     escapeRegExp(string:string) {
 
-        return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    
-    }
     updateDreamTexts() {
         const cameraDir = this.engine.camera.instance.getWorldDirection(new THREE.Vector3()).normalize();
-        let escapedWord = this.queryString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-        let regex = new RegExp(`(^|[^\\p{L}\\p{N}])${escapedWord}($|[^\\p{L}\\p{N}])`, 'gu');
+        let regex = new RegExp(`(^|[^\\p{L}\\p{N}])${this.normalizeString(this.queryString)}($|[^\\p{L}\\p{N}])`, 'u');
         
         for (let i = 0; i < this.nneighbors; i++) {
             const dreamEntry = this.dreamTexts.at(i);
 
             if (i < this.highlightedIds.length) {
                 const currentDream: Dream = this.dreams.get(this.highlightedIds[i])!;
-                const text = currentDream.getReport(this.textUI.isOriginal)
+                const text = currentDream.getReport(this.textUI.isOriginal);
                 if (i == 0) {
                     if (this.queryString != '') {
-                        const index = text.search(regex);
+                        const index = this.normalizeString(text).search(regex);
                         dreamEntry!.textMesh.colorRanges = { 0: 0xfffffff, [index]: this.neighborColor, [index + this.queryString.length + 1]: 0xffffff };
                     }
                     //"│───────────────────────────────────────────────────────────────────────────│ \n\n" + 
@@ -351,8 +349,8 @@ export class OniricaInteractive implements Experience {
                         const x = parseFloat(row.x) * scale;
                         const y = parseFloat(row.y) * scale;
                         const z = parseFloat(row.z) * scale;
-                        const dreamReport = String(row.report).replace(/(\r\n|\n|\r)/gm, "").replace(/[^\x00-\x7F]/, "");
-                        const dreamReport_es = String(row.report_es).replace(/(\r\n|\n|\r)/gm, "").replace(/[^\x00-\x7F]/, "");
+                        const dreamReport = String(row.report);
+                        const dreamReport_es = String(row.report_es);
 
                         //const topics = String(row.keywords)
 
@@ -409,16 +407,17 @@ export class OniricaInteractive implements Experience {
         this.engine.scene.add(axesHelper);
     }
 
+    normalizeString(str:string) {
+        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    
+    }
     search(word: string, dreams: Dream[]): number[] {
         this.queryString = word;
         const indices: number[] = [];
         dreams.forEach((dream, index) => {
-            let escapedWord = this.queryString.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-
-            let regex = new RegExp(`(^|[^\\p{L}\\p{N}])${escapedWord}($|[^\\p{L}\\p{N}])`, 'gu');
+            let regex = new RegExp(`(^|[^\\p{L}\\p{N}])${this.normalizeString(this.queryString)}($|[^\\p{L}\\p{N}])`, 'u');
     
-            if (regex.test(dream.getReport(this.textUI.isOriginal))) {
-
+            if (regex.test(this.normalizeString(dream.getReport(this.textUI.isOriginal)))) {
                 indices.push(index);
             }
         });
