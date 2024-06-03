@@ -11,6 +11,7 @@ import Utils from './Utils'
 import InactivityTracker from './InactivityTracker';
 
 import { TroikaText } from './TroikaText';
+import DBManager from './DBManager';
 
 export class OniricaInteractive implements Experience {
     private hasCSVLoaded: boolean = false;
@@ -31,6 +32,7 @@ export class OniricaInteractive implements Experience {
 
     private tree: kdTree<THREE.Vector3> | undefined
     private points: THREE.Points | undefined
+    private dbManager: DBManager;
 
     public baseColor = new THREE.Color(0xe6e6e6);
     public selectColor = new THREE.Color(0xffffff)
@@ -45,6 +47,8 @@ export class OniricaInteractive implements Experience {
     backgroundMesh: any;
 
     constructor(private engine: Engine) {
+        this.dbManager = DBManager.getInstance();
+
         this.dreams = new Map<number, Dream>()
         this.parseCSV().finally(() => {
             this.createScene();
@@ -144,7 +148,9 @@ export class OniricaInteractive implements Experience {
             this.resetQuery()
             return
         }
-
+        this.dbManager.writeNewRow(field.value.trim()).then((e: any) => {
+            console.log(e)
+        });
         this.updatePointColor(this.queriedIds, this.baseColor)
         this.textUI.showButtons()
 
