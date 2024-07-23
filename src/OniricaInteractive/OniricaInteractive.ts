@@ -12,12 +12,15 @@ import InactivityTracker from './InactivityTracker';
 
 import { TroikaText } from './TroikaText';
 import DBManager from './DBManager';
+import { Sheet } from './UI/Sheet';
+import fragmentShader from '../glsl/point.frag';
+import vertexShader from '../glsl/point.vert';
 
 export class OniricaInteractive implements Experience {
     private hasCSVLoaded: boolean = false;
     private cameraForwardDistance: number = 0.5
     private nneighbors: number = 8;
-    private textUI: TextUI = new TextUI();
+    //private textUI: TextUI = new TextUI();
     private dreams: Map<number, Dream>;
     private queriedDreams: Dream[] = []
     private cameraPos: THREE.Vector3 = new THREE.Vector3();
@@ -36,18 +39,23 @@ export class OniricaInteractive implements Experience {
 
     public baseColor = new THREE.Color(0xe6e6e6);
     public selectColor = new THREE.Color(0xffffff)
-    public neighborColor = new THREE.Color(0xd00000)
+    public neighborColor = new THREE.Color(0x727acf)
     public axesColor = new THREE.Color(0xe4e4e4)
 
     public maxTextWidth = 0.10
+
+    private material!: THREE.ShaderMaterial;
 
     resources: Resource[] = [
     ]
     queryString: string = '';
     backgroundMesh: any;
+    sheet: Sheet
 
     constructor(private engine: Engine) {
         this.dbManager = DBManager.getInstance();
+
+        this.sheet = new Sheet()
 
         this.dreams = new Map<number, Dream>()
         this.parseCSV().finally(() => {
@@ -72,7 +80,7 @@ export class OniricaInteractive implements Experience {
         document.getElementById("crossIcon")?.addEventListener('click', () => {
             const inputElement = document.getElementById("userInput") as HTMLInputElement;
             if (inputElement) inputElement.value = "";
-            this.textUI.resetKeyboard()
+            //this.textUI.resetKeyboard()
             this.resetQuery()
             document.getElementById("keyboardContainer")?.classList.add("hidden");
         })
@@ -83,7 +91,7 @@ export class OniricaInteractive implements Experience {
 
         document.getElementById('toggle')?.addEventListener('click', () => {
 
-            this.textUI.isOriginal = !this.textUI.isOriginal
+            //this.textUI.isOriginal = !//this.textUI.isOriginal
 
             this.updateDreamTexts()
 
@@ -113,20 +121,20 @@ export class OniricaInteractive implements Experience {
     }
 
     listenForSearchEvents() {
-        const field = document.getElementById('userInput') as HTMLInputElement;
-        const search = document.getElementById('searchIcon') as HTMLButtonElement;
+        // const field = document.getElementById('userInput') as HTMLInputElement;
+        // const search = document.getElementById('searchIcon') as HTMLButtonElement;
 
-        field.addEventListener("keypress", function (event: KeyboardEvent) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                search.click();
-            }
-        })
+    //     field.addEventListener("keypress", function (event: KeyboardEvent) {
+    //         if (event.key === "Enter") {
+    //             event.preventDefault();
+    //             search.click();
+    //         }
+    //     })
 
-        search.addEventListener('click', () => {
-            this.queryDreams()
-            document.getElementById("keyboardContainer")?.classList.add("hidden");
-        })
+    //     search.addEventListener('click', () => {
+    //         this.queryDreams()
+    //         document.getElementById("keyboardContainer")?.classList.add("hidden");
+    //     })
     }
 
     listenForNavigateEvent() {
@@ -152,14 +160,14 @@ export class OniricaInteractive implements Experience {
             console.log(e)
         });
         this.updatePointColor(this.queriedIds, this.baseColor)
-        this.textUI.showButtons()
+        //this.textUI.showButtons()
 
         const dreamArray = Array.from(this.dreams.values())
         this.queriedIds = this.search(field.value.trim(), dreamArray)
         const queriedIdsSet = new Set(this.queriedIds);
         this.queriedDreams = dreamArray.filter((d: Dream) => queriedIdsSet.has(d.id));
 
-        this.textUI.updateDreamCounter(this.queriedIds.length.toString())
+        //this.textUI.updateDreamCounter(this.queriedIds.length.toString())
 
         if (this.queriedIds.length > 0) {
 
@@ -189,7 +197,7 @@ export class OniricaInteractive implements Experience {
         this.updatePointColor(this.queriedIds, this.baseColor)
         this.queriedIds = []
         this.queryString = ''
-        this.textUI.updateDreamCounter("-1")
+        //this.textUI.updateDreamCounter("-1")
         this.updateNearest(this.cameraForwardDistance);
     }
 
@@ -199,6 +207,7 @@ export class OniricaInteractive implements Experience {
     update() {
         if (this.hasCameraChanged() && this.hasCSVLoaded) {
             this.updateNearest(this.cameraForwardDistance)
+            this.material.uniforms.cameraPosition.value.copy(this.engine.camera.instance.position);
         }
 
     }
@@ -290,7 +299,7 @@ export class OniricaInteractive implements Experience {
 
             if (i < this.highlightedIds.length) {
                 const currentDream: Dream = this.dreams.get(this.highlightedIds[i])!;
-                const text = currentDream.getReport(this.textUI.isOriginal);
+                const text = currentDream.getReport(true);
                 if (i == 0) {
                     if (this.queryString != '') {
                         const index = this.normalizeString(text).search(regex);
@@ -403,12 +412,29 @@ export class OniricaInteractive implements Experience {
         geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
         const texture = new THREE.TextureLoader().load('sprite.png' ); 
-        let material = new THREE.PointsMaterial( { size: 0.08, map: texture, vertexColors: true, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } )
-        this.points = new THREE.Points(geometry, material);
+
+        //this.material = new THREE.PointsMaterial( { size: 0.08, map: texture, vertexColors: true, blending: THREE.NormalBlending, alphaTest: 0.1, transparent: true } );
+
+    
+    // Define shader material
+    this.material = new THREE.ShaderMaterial({
+            uniforms: {
+                cameraPosition: { value: this.engine.camera.instance.position},
+                size: { value: 70.0 },
+                colorNear: { value: new THREE.Color(0xffffff) }, // Base color
+                colorFar: { value: new THREE.Color(0x000000) }, // Color when far
+                pointTexture: { value: texture },
+            },
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            blending: THREE.NormalBlending,
+            transparent: true
+        });
+        
+        this.points = new THREE.Points(geometry, this.material);
 
         this.engine.scene.add(this.points);
         this.engine.raycaster.setIntersectionObjects([this.points])
-
 
         //add axes
         const axesHelper = new THREE.AxesHelper(7);
@@ -426,7 +452,7 @@ export class OniricaInteractive implements Experience {
         dreams.forEach((dream, index) => {
             let regex = new RegExp(`(^|[^\\p{L}\\p{N}])${this.normalizeString(this.queryString)}($|[^\\p{L}\\p{N}])`, 'u');
     
-            if (regex.test(this.normalizeString(dream.getReport(this.textUI.isOriginal)))) {
+            if (regex.test(this.normalizeString(dream.getReport(true)))) {
                 indices.push(index);
             }
         });

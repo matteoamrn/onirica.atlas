@@ -19,7 +19,7 @@ export class TroikaText {
         this.textMesh.maxWidth = options.maxTextWidth || 0.001
         this.maxTextWidth = options.maxTextWidth
         this.textMesh.outlineColor = 'black'
-        this.textMesh.outlineWidth = 0.0003
+        this.textMesh.outlineWidth = 0.000
 
         this.textMesh.fontSize = options.fontSize || 1;
         this.textMesh.color = options.color || 'black';

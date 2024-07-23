@@ -1,8 +1,7 @@
 import { WebGLRenderer } from 'three'
 import { Engine } from './Engine'
-import * as THREE from 'three'
 import { GameEntity } from './GameEntity'
-import { BlendFunction, DepthEffect, EffectComposer, EffectPass, VignetteEffect, RenderPass } from 'postprocessing'
+import {EffectComposer, EffectPass, VignetteEffect, RenderPass } from 'postprocessing'
 
 export class RenderEngine implements GameEntity {
   public readonly renderer: WebGLRenderer
@@ -16,10 +15,6 @@ export class RenderEngine implements GameEntity {
     })
 
 
-    this.renderer.toneMapping = THREE.CineonToneMapping
-    this.renderer.toneMappingExposure = 1.75
-    this.renderer.shadowMap.enabled = true
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
     this.renderer.setClearColor('#000000')
     this.renderer.setSize(this.engine.sizes.width, this.engine.sizes.height)
     this.renderer.setPixelRatio(Math.min(this.engine.sizes.pixelRatio, 2))
@@ -31,18 +26,6 @@ export class RenderEngine implements GameEntity {
       this.engine.camera.instance
     )
 
-    // const depthOfFieldEffect = new DepthOfFieldEffect(this.engine.camera.instance, {
-    //   focusDistance: 0.1,
-    //   focalLength: 2,
-    //   bokehScale: 8,
-    //   height: 2048
-    // });
-
-    //this.engine.scene.fog = new THREE.Fog( 0x000000, 2.5, 20);
-
-    const depthEffect = new DepthEffect({
-      blendFunction: BlendFunction.SKIP
-    });
 
     const vignetteEffect = new VignetteEffect({
       eskil: false,
@@ -53,7 +36,6 @@ export class RenderEngine implements GameEntity {
     const effectPass = new EffectPass(
 			this.engine.camera.instance,
 			vignetteEffect,
-			depthEffect
 		);
 
     this.composer.addPass(renderPass)

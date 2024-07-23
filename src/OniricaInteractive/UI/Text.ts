@@ -12,7 +12,7 @@ export type TextConfig = {
 export class TextUI {
   private container!: HTMLDivElement;
   private keyboard: Keyboard
-  public isOriginal: boolean = false
+  public isOriginal: boolean = true
 
   constructor(config: TextConfig = {}) {
     if (config.documentTitle) {
@@ -61,7 +61,7 @@ export class TextUI {
     </label>
     `
     )
-    document.body.append(langIcon)
+    //document.body.append(langIcon)
 
 
     document.body.prepend(this.container);
