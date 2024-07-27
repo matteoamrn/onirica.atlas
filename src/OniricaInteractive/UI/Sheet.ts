@@ -1,6 +1,7 @@
-import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer'
+import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer'
 import './sheet.scss'
 import { Engine } from '../../engine/Engine'
+import gsap from 'gsap'
 
 export type TextConfig = {
   title?: string
@@ -19,7 +20,9 @@ export class Sheet {
         this.container.classList.add('main');
         this.container.innerHTML = 
         `
-        <div class="dream-card" style>
+        <div class="dream-card">
+        <i id="card-exit" class="fas fa-times" ></i>
+
             <h1>Dream no. 748 | NotREM (ST4: deep sleep)</h1>
             <p>I had to prepare the car, I needed to put suitcases in it, some luggage, they were suitcases, some packages, everything was quite confusing. It was me, and there were two of my friends (who took an exam with me today). These packages had the shape of human body organs. It was a road near a pine forest. We didn't talk, just loaded these strange packages.</p>
             <div class="details">
@@ -42,15 +45,20 @@ export class Sheet {
             </div>
     </div>
     `
-
+    this.container.style.opacity = '0';
     this.cssObject = new CSS3DObject(this.container);
+    this.cssObject.element.children[0].children[0].addEventListener('click', () => {
+        gsap.to(this.container.style, { opacity: 0, ease: "expo.out", duration: 1.5 })
+    })
     this.cssObject.element.style.pointerEvents = 'none';
+
     this.cssObject.scale.set(0.0001, 0.0001, 0.0001)
     engine.CSSscene.add(this.cssObject);
+    
 }
 
 update(){
-    // this.cssObject.lookAt(this.engine.camera.instance.position)
+    this.cssObject.lookAt(this.engine.camera.instance.position)
 
 }
 updatePosition(x: number, y: number, z: number) {

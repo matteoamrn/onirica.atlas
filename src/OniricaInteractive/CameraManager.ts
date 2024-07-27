@@ -46,9 +46,11 @@ export class CameraManager {
   }
 
   onDreamSelection(instanceId: number) {
+    //this.engine.camera.lock()
     if (instanceId !== this.selectedId) {
       this.selectedId = instanceId;
       const dreamPos = this.dreamManager.getDream(instanceId)!.position;
+
       if (dreamPos) {
         this.engine.camera.animateTo(dreamPos);
         this.engine.camera.update();

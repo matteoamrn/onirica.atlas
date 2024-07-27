@@ -92,7 +92,7 @@ export class SceneManager {
     const cameraDir = this.engine.camera.instance.getWorldDirection(new THREE.Vector3()).normalize();
     const regex = new RegExp(`(^|[^\\p{L}\\p{N}])${this.normalizeString(queryString)}($|[^\\p{L}\\p{N}])`, 'u');
 
-    for (let i = 0; i < this.dreamTexts.length; i++) {
+    for (let i = 1; i < this.dreamTexts.length; i++) {
         const dreamText = this.dreamTexts[i];
         const dream = this.dreams.get(highlightedIds[i]);
   

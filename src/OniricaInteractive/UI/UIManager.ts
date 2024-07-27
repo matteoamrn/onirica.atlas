@@ -2,6 +2,7 @@ import { Engine } from "../../engine/Engine";
 import { CameraManager } from "../CameraManager";
 import { DreamManager } from "../DreamManager";
 import { Sheet } from "./Sheet";
+import gsap from 'gsap'
 
 export class UIManager {
   private engine: Engine;
@@ -34,10 +35,10 @@ export class UIManager {
           const instanceId = intersections[0].index ? intersections[0].index : 0;
           this.cameraManager.onDreamSelection(instanceId);
           this.sheet.updatePosition(intersections[0].point.x, intersections[0].point.y, intersections[0].point.z);
-          this.sheet.cssObject.lookAt(this.engine.camera.instance.position)
-
-      }
+          gsap.to(this.sheet.container.style, { opacity: 1, ease: "expo.in", duration: 2.5 })
+        }
     })
+    
   }
 
   private listenForSearchEvents() {

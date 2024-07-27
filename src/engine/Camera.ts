@@ -86,4 +86,12 @@ export class Camera implements GameEntity {
     this.controls.setLookAt( this.initPos.x, this.initPos.y, this.initPos.z, 0, 0, 0, true)
 }
 
+  lock(){
+    this.controls.enabled = false
+  }
+
+  unlock(){
+    this.controls.enabled = true
+  }
+
 }

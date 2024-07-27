@@ -10,6 +10,17 @@
     font-family: 'MartianMonoLight';
     position: absolute;
     transform: translate(-125%, -50%);
+
+    #card-exit{
+        position: absolute; 
+        top: 30px; 
+        right: 30px; 
+        cursor: pointer; 
+        pointer-events:all !important;
+        border-width: 3px solid white;
+        padding: 10px;
+        
+    }
     
 }
 
