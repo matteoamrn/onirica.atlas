@@ -13,6 +13,8 @@ import { Raycaster } from './Raycaster'
 export class Engine {
   public readonly camera!: Camera
   public readonly scene!: THREE.Scene
+  public readonly CSSscene!: THREE.Scene
+
   public readonly renderEngine!: RenderEngine
   public readonly time!: RenderLoop
   public readonly debug!: DebugUI
@@ -42,6 +44,7 @@ export class Engine {
     this.debug = new DebugUI()
     this.time = new RenderLoop(this)
     this.scene = new THREE.Scene()
+    this.CSSscene = new THREE.Scene()
     this.camera = new Camera(this)
     this.raycaster = new Raycaster(this)
     this.infoUI = new InfoUI(info)

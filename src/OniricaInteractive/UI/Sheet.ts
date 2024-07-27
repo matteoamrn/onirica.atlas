@@ -1,4 +1,6 @@
+import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer'
 import './sheet.scss'
+import { Engine } from '../../engine/Engine'
 
 export type TextConfig = {
   title?: string
@@ -7,17 +9,17 @@ export type TextConfig = {
 }
 
 export class Sheet {
-    public isOriginal: boolean = true
     container: HTMLDivElement
+    cssObject: CSS3DObject
+    engine: Engine
 
-  constructor() {
-
-      this.container = document.createElement('div');
-      this.container.classList.add('main');
-      this.container.insertAdjacentHTML(
-        'beforeend',
+  constructor(engine: Engine) {
+        this.engine = engine;
+        this.container = document.createElement('div');
+        this.container.classList.add('main');
+        this.container.innerHTML = 
         `
-        <div class="dream-card">
+        <div class="dream-card" style>
             <h1>Dream no. 748 | NotREM (ST4: deep sleep)</h1>
             <p>I had to prepare the car, I needed to put suitcases in it, some luggage, they were suitcases, some packages, everything was quite confusing. It was me, and there were two of my friends (who took an exam with me today). These packages had the shape of human body organs. It was a road near a pine forest. We didn't talk, just loaded these strange packages.</p>
             <div class="details">
@@ -38,12 +40,20 @@ export class Sheet {
                 <div class="detail">Body sensations: N</div>
                 <div class="detail">Narrative continuity: Y</div>
             </div>
-        <div class="search-bar">
-            <input type="text" placeholder="Search...">
-        </div>
     </div>
-   `)
+    `
 
-   document.body.prepend(this.container)
+    this.cssObject = new CSS3DObject(this.container);
+    this.cssObject.element.style.pointerEvents = 'none';
+    this.cssObject.scale.set(0.0001, 0.0001, 0.0001)
+    engine.CSSscene.add(this.cssObject);
+}
+
+update(){
+    // this.cssObject.lookAt(this.engine.camera.instance.position)
+
+}
+updatePosition(x: number, y: number, z: number) {
+    this.cssObject.position.set(x, y, z)
 }
 }
