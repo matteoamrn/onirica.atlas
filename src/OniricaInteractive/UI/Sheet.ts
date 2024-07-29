@@ -23,7 +23,7 @@ export class Sheet {
         <div class="dream-card">
         <i id="card-exit" class="fas fa-times" ></i>
 
-            <h1>Dream no. 748 | NotREM (ST4: deep sleep)</h1>
+            <h1></h1>
             <p>I had to prepare the car, I needed to put suitcases in it, some luggage, they were suitcases, some packages, everything was quite confusing. It was me, and there were two of my friends (who took an exam with me today). These packages had the shape of human body organs. It was a road near a pine forest. We didn't talk, just loaded these strange packages.</p>
             <div class="details">
                 <div class="detail">Age: 20-30</div>
@@ -48,7 +48,11 @@ export class Sheet {
     this.container.style.opacity = '0';
     this.cssObject = new CSS3DObject(this.container);
     this.cssObject.element.children[0].children[0].addEventListener('click', () => {
-        gsap.to(this.container.style, { opacity: 0, ease: "expo.out", duration: 1.5 })
+    gsap.to(this.container.style, {
+        opacity: 0,
+        ease: "expo.out",
+        duration: 1.5,
+    });
     })
     this.cssObject.element.style.pointerEvents = 'none';
 
@@ -59,8 +63,15 @@ export class Sheet {
 
 update(){
     this.cssObject.lookAt(this.engine.camera.instance.position)
-
+    this.cssObject.up.set(0, 1, 0);
 }
+
+updateText(text: string, dreamId: number){
+    this.cssObject.element.querySelector('h1')!.textContent = "Dream no. " + String(dreamId);
+
+    this.cssObject.element.querySelector('p')!.textContent = text;
+}
+
 updatePosition(x: number, y: number, z: number) {
     this.cssObject.position.set(x, y, z)
 }

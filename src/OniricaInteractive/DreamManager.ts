@@ -15,7 +15,7 @@ export class DreamManager {
     return Array.from(this.dreams.values());
   }
 
-  searchDreams(word: string): number[] {
+  async searchDreams(word: string): Promise<number[]> {
     const indices: number[] = [];
     this.dreams.forEach((dream, index) => {
       const regex = new RegExp(`(^|[^\\p{L}\\p{N}])${this.sanitizeString(word)}($|[^\\p{L}\\p{N}])`, 'u');

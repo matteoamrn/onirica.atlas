@@ -99,9 +99,28 @@ export class CameraManager {
   }
 
   setQueriedIds(queriedIds: number[]) {
+    if (this.queriedIds.length > 0) {
+
     this.queriedIds = queriedIds;
     const queriedIdsSet = new Set(this.queriedIds);
     this.queriedDreams = this.dreams.filter((d: Dream) => queriedIdsSet.has(d.id));
+
+
+    const firstQueriedDreamId = this.queriedIds[0];
+    this.selectedId = firstQueriedDreamId;
+    this.engine.camera.animateTo(this.dreams![firstQueriedDreamId].position);
+    this.sceneManager.updatePointColor(this.queriedIds, COLORS.NEIGHBOR)
+    
+
+    const filteredPositions = this.dreamManager.getAllDreams()
+        .filter(d => queriedIdsSet.has(d.id))
+        .map(d => d.position);
+    this.tree = new kdTree(filteredPositions, Utils.distance, ["x", "y", "z"]);
+
+
+    this.updateNearest(this.cameraForwardDistance);
+    }
+
 }
 
   get _queriedIds(): number[] {

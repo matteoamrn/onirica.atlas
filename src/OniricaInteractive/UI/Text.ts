@@ -171,7 +171,6 @@ export class TextUI {
 
   }
 
-
   updateReportText(newText: string, dreamId: string) {
     const reportTextElement = this.container.querySelector('.scrollable-text') as HTMLTextAreaElement;
     if (reportTextElement) {

@@ -3,130 +3,166 @@ import { CameraManager } from "../CameraManager";
 import { DreamManager } from "../DreamManager";
 import { Sheet } from "./Sheet";
 import gsap from 'gsap'
+import { TextUI } from "./Text";
+import { SceneManager } from "../SceneManager";
+import COLORS from "../utils/Colors";
 
 export class UIManager {
-  private engine: Engine;
-  private dreamManager: DreamManager;
-  private sheet:Sheet
-  private cameraManager: CameraManager;
-  public queryString: string = '';
+	private engine: Engine;
+	private dreamManager: DreamManager;
+	private sheet: Sheet
+	private textUI: TextUI
+	private cameraManager: CameraManager;
+	private sceneManager: SceneManager
+	public queryString: string = '';
 
-  constructor(engine: Engine, dreamManager: DreamManager, cameraManager: CameraManager) {
-    this.engine = engine;
-    this.dreamManager = dreamManager;
-    this.cameraManager = cameraManager;
-    this.sheet = new Sheet(engine);
-    this.queryString = '';
-    this.listenForClickEvents();
+	constructor(engine: Engine, dreamManager: DreamManager, cameraManager: CameraManager, sceneManager: SceneManager) {
+		this.engine = engine;
+		this.textUI = new TextUI()
+		this.dreamManager = dreamManager;
+		this.cameraManager = cameraManager;
+		this.sheet = new Sheet(engine);
+		this.queryString = '';
+		this.sceneManager = sceneManager;
+		this.listenForClickEvents();
 
-  }
+	}
 
-  init() {
-    this.listenForClickEvents();
-    // this.listenForSearchEvents();
-    // this.listenForNavigateEvents();
-    // this.listenForHomeIconClickEvent();
-    // this.listenForCrossIconClickEvent();
-  }
+	init() {
+		this.listenForClickEvents();
+		this.listenForSearchEvents();
+		this.listenForNavigateEvents();
+		this.listenForHomeIconClickEvent();
+		this.listenForCrossIconClickEvent();
+	}
 
-  private listenForClickEvents() {
-    this.engine.raycaster.on('click', (intersections: THREE.Intersection[]) => {
-      if (intersections.length > 0) {
-          const instanceId = intersections[0].index ? intersections[0].index : 0;
-          this.cameraManager.onDreamSelection(instanceId);
-          this.sheet.updatePosition(intersections[0].point.x, intersections[0].point.y, intersections[0].point.z);
-          gsap.to(this.sheet.container.style, { opacity: 1, ease: "expo.in", duration: 2.5 })
-        }
-    })
-    
-  }
+	private listenForClickEvents() {
+		this.engine.raycaster.on('click', (intersections: THREE.Intersection[]) => {
+			if (intersections.length > 0) {
+				const instanceId = intersections[0].index ? intersections[0].index : 0;
+				this.onDreamSelection(instanceId);
+			}
+		})
 
-  private listenForSearchEvents() {
-    const field = document.getElementById('userInput') as HTMLInputElement;
-    const search = document.getElementById('searchIcon') as HTMLButtonElement;
+	}
 
-    field.addEventListener('keypress', (event: KeyboardEvent) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        search.click();
-      }
-    });
+	private listenForSearchEvents() {
+		const field = document.getElementById('userInput') as HTMLInputElement;
+		const search = document.getElementById('searchIcon') as HTMLButtonElement;
 
-    search.addEventListener('click', () => {
-      this.queryDreams();
-      document.getElementById('keyboardContainer')?.classList.add('hidden');
-    });
-  }
+		field.addEventListener('keypress', (event: KeyboardEvent) => {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+				search.click();
+			}
+		});
 
-  private listenForNavigateEvents() {
-    const buttonNext = document.getElementById('button-next') as HTMLButtonElement;
-    buttonNext.addEventListener('click', () => {
-      this.navigateToNextDream();
-    });
+		search.addEventListener('click', () => {
+			this.queryDreams();
+			document.getElementById('keyboardContainer')?.classList.add('hidden');
+			this.textUI.showButtons()
+		});
+	}
 
-    const buttonPrevious = document.getElementById('button-previous') as HTMLButtonElement;
-    buttonPrevious.addEventListener('click', () => {
-      this.navigateToPreviousDream();
-    });
-  }
+	private listenForNavigateEvents() {
+		const buttonNext = document.getElementById('button-next') as HTMLButtonElement;
+		buttonNext.addEventListener('click', () => {
+			this.navigateToNextDream();
+		});
 
-  private listenForHomeIconClickEvent() {
-    const homeIcon = document.getElementById('homeIcon') as HTMLButtonElement;
-    homeIcon.addEventListener('click', () => {
-      this.engine.camera.reset();
-    });
-  }
+		const buttonPrevious = document.getElementById('button-previous') as HTMLButtonElement;
+		buttonPrevious.addEventListener('click', () => {
+			this.navigateToPreviousDream();
+		});
+	}
 
-  private listenForCrossIconClickEvent() {
-    const crossIcon = document.getElementById('crossIcon') as HTMLButtonElement;
-    crossIcon.addEventListener('click', () => {
-      const inputElement = document.getElementById('userInput') as HTMLInputElement;
-      if (inputElement) inputElement.value = '';
-      this.resetQuery();
-      document.getElementById('keyboardContainer')?.classList.add('hidden');
-    });
-  }
+	private listenForHomeIconClickEvent() {
+		const homeIcon = document.getElementById('homeIcon') as HTMLButtonElement;
+		homeIcon.addEventListener('click', () => {
+			this.engine.camera.reset();
+		});
+	}
 
-  private queryDreams() {
-    const field = document.getElementById('userInput') as HTMLInputElement;
-    this.queryString = field.value.trim();
-    const queriedIds = this.dreamManager.searchDreams(this.queryString);
-    this.cameraManager.setQueriedIds(queriedIds);
+	private listenForCrossIconClickEvent() {
+		const crossIcon = document.getElementById('crossIcon') as HTMLButtonElement;
+		crossIcon.addEventListener('click', () => {
+			const inputElement = document.getElementById('userInput') as HTMLInputElement;
+			if (inputElement) inputElement.value = '';
+			this.resetQuery();
+			document.getElementById('keyboardContainer')?.classList.add('hidden');
+			this.textUI.hideButtons()
+		});
+	}
 
-    if (queriedIds.length > 0) {
-      const firstQueriedDreamId = queriedIds[0];
-      this.cameraManager.onDreamSelection(firstQueriedDreamId);
-    }
-  }
+	queryDreams() {
+		const field = document.getElementById('userInput') as HTMLInputElement;
 
-  private navigateToNextDream() {
-    const queriedIds = this.cameraManager._queriedIds;
-    if (queriedIds.length > 0) {
-      const currentIndex = queriedIds.indexOf(this.cameraManager.getSelectedId());
-      const nextIndex = (currentIndex + 1) % queriedIds.length;
-      const nextDreamId = queriedIds[nextIndex];
-      this.cameraManager.onDreamSelection(nextDreamId);
-    }
-  }
+		if (field.value == "" || field.value == " ") {
+			this.resetQuery()
+			return
+		}
 
-  private navigateToPreviousDream() {
-    const queriedIds = this.cameraManager._queriedIds;
-    if (queriedIds.length > 0) {
-      const currentIndex = queriedIds.indexOf(this.cameraManager.getSelectedId());
-      const previousIndex = (currentIndex - 1 + queriedIds.length) % queriedIds.length;
-      const previousDreamId = queriedIds[previousIndex];
-      this.cameraManager.onDreamSelection(previousDreamId);
-    }
-  }
+		this.dreamManager.searchDreams(field.value).then((ids: number[]) => {
+			if (ids.length == 0) this.textUI.updateDreamCounter("-1")
+			else {
+				this.cameraManager.setQueriedIds(ids)
+				this.onDreamSelection(ids[0])
+				this.textUI.updateDreamCounter(ids.length.toString())
+			}
 
-  public resetQuery() {
-    this.queryString = '';
-    this.cameraManager.setQueriedIds([]);
-  }
+		})
 
-  update() {
-    this.cameraManager.update(this.queryString);
-    this.sheet.update();
-  }
+	}
+
+
+	private navigateToNextDream() {
+		const queriedIds = this.cameraManager._queriedIds;
+		if (queriedIds.length > 0) {
+			const currentIndex = queriedIds.indexOf(this.cameraManager.getSelectedId());
+			const nextIndex = (currentIndex + 1) % queriedIds.length;
+			const nextDreamId = queriedIds[nextIndex];
+			this.onDreamSelection(nextDreamId);
+		}
+	}
+
+	private navigateToPreviousDream() {
+		const queriedIds = this.cameraManager._queriedIds;
+		if (queriedIds.length > 0) {
+			const currentIndex = queriedIds.indexOf(this.cameraManager.getSelectedId());
+			const previousIndex = (currentIndex - 1 + queriedIds.length) % queriedIds.length;
+			const previousDreamId = queriedIds[previousIndex];
+			this.onDreamSelection(previousDreamId)
+		}
+	}
+
+	public resetQuery() {
+		this.queryString = '';
+		this.cameraManager.setQueriedIds([]);
+	}
+
+	private onDreamSelection(dreamId: number) {
+		const dream = this.dreamManager.getDream(dreamId)
+		if (dream){
+			const dreamPos = dream!.position;
+			this.cameraManager.onDreamSelection(dreamId);
+			this.sheet.updatePosition(dreamPos.x, dreamPos.y, dreamPos.z);
+			this.sheet.updateText(dream.dreamReport, dreamId);
+			gsap.to(this.sheet.container.style, {
+				opacity: 1,
+				ease: "expo.in",
+				duration: 2.5,
+			// 	onUpdate: () => {
+			// 		this.sheet.cssObject.lookAt(this.engine.camera.instance.position)           
+			// }		
+			})
+		}
+
+	}
+
+
+	update() {
+		this.cameraManager.update(this.queryString);
+		this.sheet.update()
+	}
 }
 
