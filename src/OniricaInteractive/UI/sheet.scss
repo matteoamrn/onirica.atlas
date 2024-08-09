@@ -1,37 +1,98 @@
+.main{
+    width:100%;
+    height:100%;
+    position: absolute;
+    fill-opacity: 0%;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
 
+}
 
-.dream-card {
-    background-color: rgba(0, 0, 0, 0.97);
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: absolute;
+    fill-opacity: 0%;
+}
+
+#dreamCard {
+    background-color: rgba(0, 0, 0, 0.8);
     padding: 20px;
     border: 1px solid white;
-    width: 750px;
-    height: 750px;
+    width: 60vh;
+    height: 60vh;
+    position: relative;
+    left: 0vh;
     color:white;
     font-family: 'MartianMonoLight';
-    position: absolute;
-    transform: translate(-125%, -50%);
-
+    box-sizing: border-box;
+    overflow: hidden; /* Prevent content overflow */
+    
     #card-exit{
         position: absolute; 
-        top: 30px; 
+        top: 20px; 
         right: 30px; 
         cursor: pointer; 
         pointer-events:all !important;
         border-width: 3px solid white;
-        padding: 10px;
+        padding: 0px;
         
     }
-    
+
+}
+
+.clickable{
+    pointer-events:all !important;
+}
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.8); 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: white; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(144, 122, 207); 
+}
+
+.dream-card .content {
+    height: calc(80%); /* Adjust according to the height of the .details section */
+    overflow-y: auto; /* Make the content scrollable if it exceeds the container height */
+    padding: 2.5%; /* Optional, to avoid scrollbar overlap on text */
 }
 
 .dream-card h1 {
+    padding: 2.5%;
     font-size: 20px;
     font-family: 'MartianMonoBold';
 
 }
 
 .dream-card p {
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.6;
     font-family: 'MartianMonoThin';
 
@@ -40,7 +101,7 @@
 .dream-card .details {
     display: flex;
     flex-wrap: wrap;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 .detail {
@@ -53,24 +114,3 @@
     color: #3498db;
 }
 
-.bubble-bg {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: url('sprite.png') no-repeat center center;
-    background-size: cover;
-    z-index: -1;
-}
-
-.search-bar {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-}
-
-.search-bar input {
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-}

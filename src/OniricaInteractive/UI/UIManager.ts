@@ -5,7 +5,6 @@ import { Sheet } from "./Sheet";
 import gsap from 'gsap'
 import { TextUI } from "./Text";
 import { SceneManager } from "../SceneManager";
-import COLORS from "../utils/Colors";
 
 export class UIManager {
 	private engine: Engine;
@@ -13,7 +12,6 @@ export class UIManager {
 	private sheet: Sheet
 	private textUI: TextUI
 	private cameraManager: CameraManager;
-	private sceneManager: SceneManager
 	public queryString: string = '';
 
 	constructor(engine: Engine, dreamManager: DreamManager, cameraManager: CameraManager, sceneManager: SceneManager) {
@@ -21,9 +19,8 @@ export class UIManager {
 		this.textUI = new TextUI()
 		this.dreamManager = dreamManager;
 		this.cameraManager = cameraManager;
-		this.sheet = new Sheet(engine);
+		this.sheet = new Sheet();
 		this.queryString = '';
-		this.sceneManager = sceneManager;
 		this.listenForClickEvents();
 
 	}
@@ -143,14 +140,12 @@ export class UIManager {
 	private onDreamSelection(dreamId: number) {
 		const dream = this.dreamManager.getDream(dreamId)
 		if (dream){
-			const dreamPos = dream!.position;
 			this.cameraManager.onDreamSelection(dreamId);
-			this.sheet.updatePosition(dreamPos.x, dreamPos.y, dreamPos.z);
 			this.sheet.updateText(dream.dreamReport, dreamId);
 			gsap.to(this.sheet.container.style, {
 				opacity: 1,
 				ease: "expo.in",
-				duration: 2.5,
+				duration: 3,
 			// 	onUpdate: () => {
 			// 		this.sheet.cssObject.lookAt(this.engine.camera.instance.position)           
 			// }		

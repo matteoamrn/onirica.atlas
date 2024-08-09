@@ -44,7 +44,6 @@ export class Engine {
     this.debug = new DebugUI()
     this.time = new RenderLoop(this)
     this.scene = new THREE.Scene()
-    this.CSSscene = new THREE.Scene()
     this.camera = new Camera(this)
     this.raycaster = new Raycaster(this)
     this.infoUI = new InfoUI(info)

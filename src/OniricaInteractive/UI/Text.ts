@@ -20,11 +20,20 @@ export class TextUI {
     }
 
     this.container = document.createElement('div');
-    this.container.classList.add('text-container');
-    this.container.insertAdjacentHTML(
+    this.container.classList.add("infoBox")
+    let homeIcon = document.createElement('div');
+    homeIcon.id = 'homeIcon'
+    homeIcon.classList.add('home-icon')
+    homeIcon.innerHTML = 
+    ` <i class="fas fa-home"></i></div>`
+  
+    this.container.appendChild(homeIcon)
+
+    const searchbar = document.createElement('div')
+    searchbar.classList.add('searchBar');
+    searchbar.insertAdjacentHTML(
       'beforeend',
       `
-     <div class="searchBar">
         <div id="searchIcon" class='search-icon'>
           <i class="fa-solid fa-magnifying-glass"></i>
         </div>
@@ -32,48 +41,30 @@ export class TextUI {
         <div id="crossIcon" class='cross-icon'>
           <i class="fa-solid fa-x"></i>
         </div>
-      </div> 
-
-      <div id="keyboardContainer" class="keyboardContainer hidden">
-        <div class="simple-keyboard"></div>
-      </div>
       `
     );
 
-    let homeIcon = document.createElement('div');
-    homeIcon.insertAdjacentHTML('beforeend',
-      `
-    <div id="homeIcon" class='home-icon'>
-    <i class="fas fa-home"></i> 
-    </div>
-    `
-    )
-    document.body.prepend(homeIcon)
+    this.container.appendChild(searchbar)
 
-    let langIcon = document.createElement('div')
-    langIcon.insertAdjacentHTML('beforeend',
-      `
-    <input type="checkbox" id="toggle" class="toggleCheckbox" />
-    <label for="toggle" class="toggleContainer">
-    <div>ESP</div>
-    <div>ENG</div>   
-
-    </label>
-    `
-    )
-    //document.body.append(langIcon)
-
-
-    document.body.prepend(this.container);
-    const topbar = document.createElement('div');
-    topbar.classList.add('infoBar');
-    topbar.insertAdjacentHTML(
+    const infobar = document.createElement('div');
+    infobar.id = 'infoBar';
+    infobar.insertAdjacentHTML(
       'beforeend',
       `
-      <div id="dreamCount"> </div> `
-    );
+        <div id="dreamCount" class="hidden">
+        </div>
+      `)
+    this.container.appendChild(infobar)
 
-    document.body.prepend(topbar)
+    document.body.prepend(this.container);
+
+    //keyboard
+    const key = document.createElement('div')
+    key.classList.add("keyboardContainer")
+    key.id = "keyboardContainer"
+    key.innerHTML = 
+    `<div class="simple-keyboard"></div>`
+   document.body.appendChild(key)
 
     // Creazione della div per i pulsanti
     const buttonContainer = document.createElement('div');
@@ -212,6 +203,8 @@ export class TextUI {
     buttonPrevious?.classList.remove('hidden');
     const buttonNext = document.getElementById('button-next');
     buttonNext?.classList.remove('hidden');
+    const infoBar = document.getElementById('dreamCount');
+    infoBar?.classList.remove('hidden');
 
   }
 
@@ -220,7 +213,10 @@ export class TextUI {
     buttonPrevious?.classList.add('hidden');
     const buttonNext = document.getElementById('button-next');
     buttonNext?.classList.add('hidden');
+    const infoBar = document.getElementById('dreamCount');
+    infoBar?.classList.add('hidden');
 
   }
+
 
 }
