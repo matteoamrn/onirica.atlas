@@ -52,7 +52,12 @@ export class CameraManager {
       const dreamPos = this.dreamManager.getDream(instanceId)!.position;
 
       if (dreamPos) {
-        this.engine.camera.animateTo(dreamPos);
+        const distance = 0.06;
+        const XVector = new THREE.Vector3(0.0, -1.0, 0.0);
+        const perpendicularVector = new THREE.Vector3().crossVectors(this.cameraDir, XVector).normalize();
+        const finalPos = dreamPos.clone().addScaledVector(perpendicularVector, distance);
+        
+        this.engine.camera.animateTo(finalPos);
         this.engine.camera.update();
       }
     }
@@ -99,29 +104,25 @@ export class CameraManager {
   }
 
   setQueriedIds(queriedIds: number[]) {
-    if (this.queriedIds.length > 0) {
+    if (queriedIds.length === 0) {
+      this.queriedIds = [];
+      this.queriedDreams = [];
+      this.sceneManager.updatePointColor(this.dreams.map((d: Dream) => d.id), COLORS.BASE);
+      this.tree = new kdTree(this.dreams.map(d => d.position), Utils.distance, ["x", "y", "z"]);
+    } else {
+      this.queriedIds = queriedIds;
+      const queriedIdsSet = new Set(this.queriedIds);
+      this.queriedDreams = this.dreams.filter((d: Dream) => queriedIdsSet.has(d.id));
+      const firstQueriedDreamId = this.queriedIds[0];
+      this.selectedId = firstQueriedDreamId;
+      this.engine.camera.animateTo(this.dreamManager.getDream(this.selectedId)!.position);
+      this.sceneManager.updatePointColor(this.queriedIds, COLORS.NEIGHBOR);
+      const filteredPositions = this.queriedDreams.map(d => d.position);
+      this.tree = new kdTree(filteredPositions, Utils.distance, ["x", "y", "z"]);
+      this.updateNearest(this.cameraForwardDistance);
+    }  
+  }
 
-    this.queriedIds = queriedIds;
-    const queriedIdsSet = new Set(this.queriedIds);
-    this.queriedDreams = this.dreams.filter((d: Dream) => queriedIdsSet.has(d.id));
-
-
-    const firstQueriedDreamId = this.queriedIds[0];
-    this.selectedId = firstQueriedDreamId;
-    this.engine.camera.animateTo(this.dreams![firstQueriedDreamId].position);
-    this.sceneManager.updatePointColor(this.queriedIds, COLORS.NEIGHBOR)
-    
-
-    const filteredPositions = this.dreamManager.getAllDreams()
-        .filter(d => queriedIdsSet.has(d.id))
-        .map(d => d.position);
-    this.tree = new kdTree(filteredPositions, Utils.distance, ["x", "y", "z"]);
-
-
-    this.updateNearest(this.cameraForwardDistance);
-    }
-
-}
 
   get _queriedIds(): number[] {
     return this.queriedIds;

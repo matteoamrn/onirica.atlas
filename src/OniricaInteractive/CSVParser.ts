@@ -19,12 +19,13 @@ export class CSVParser {
         complete: (result: any) => {
           result.data.forEach((row: any) => {
             const id = parseInt(row.id);
+            const db = String(row.dataset)
             const x = parseFloat(row.x) * this.scale;
             const y = parseFloat(row.y) * this.scale;
             const z = parseFloat(row.z) * this.scale;
             const dreamReport = String(row.report);
 
-            const dream = new Dream(id, x, y, z, dreamReport);
+            const dream = new Dream(id, db, x, y, z, dreamReport);
             dreams.set(id, dream);
           });
 

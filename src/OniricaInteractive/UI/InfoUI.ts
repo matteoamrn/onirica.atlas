@@ -1,4 +1,4 @@
-import './text.scss'
+import './info.scss'
 import Keyboard from 'simple-keyboard';
 import 'simple-keyboard/build/css/index.css';
 import layout from "simple-keyboard-layouts/build/layouts/spanish";
@@ -9,10 +9,9 @@ export type TextConfig = {
   documentTitle?: string
 }
 
-export class TextUI {
+export class InfoUI {
   private container!: HTMLDivElement;
   private keyboard: Keyboard
-  public isOriginal: boolean = true
 
   constructor(config: TextConfig = {}) {
     if (config.documentTitle) {
@@ -60,7 +59,7 @@ export class TextUI {
 
     //keyboard
     const key = document.createElement('div')
-    key.classList.add("keyboardContainer")
+    key.classList.add("keyboardContainer", "hidden")
     key.id = "keyboardContainer"
     key.innerHTML = 
     `<div class="simple-keyboard"></div>`
@@ -112,29 +111,8 @@ export class TextUI {
       }
     });
 
-
-    document.getElementById("keyboardContainer")?.classList.add("hidden");
-    const search = document.getElementById('searchIcon') as HTMLButtonElement;
-    search.click()
-
-    document.getElementById("userInput")!.addEventListener('focus', function () {
-      document.getElementById("keyboardContainer")?.classList.remove("hidden");
-    });
-
-    document.getElementById("keyboardContainer")!.addEventListener('blur', function () {
-      document.getElementById("keyboardContainer")?.classList.add("hidden");
-    });
-
-    document.getElementById("keyboardContainer")!.addEventListener('blur', function () {
-      document.getElementById("keyboardContainer")?.classList.add("hidden");
-    });
-
-
-    document.addEventListener("DOMContentLoaded", () => {
-
       const userInput = document.getElementById('userInput');
       const keyboard = document.getElementById('keyboardContainer');
-      const textContainer = document.querySelector('.text-container');
 
       function showKeyboard() {
         keyboard?.classList.remove("hidden");
@@ -146,18 +124,13 @@ export class TextUI {
 
       userInput!.addEventListener('focus', showKeyboard);
 
-
       document.addEventListener('click',  (event:any) => {
-
-        if (!textContainer!.contains(event.target)) {
+        if (!keyboard!.contains(event.target) && event.target !== userInput) {
           hideKeyboard();
-        } else if (keyboard!.contains(event.target)) {
-          showKeyboard();
-        }
+        } 
 
       });
 
-    });
 
 
   }
@@ -180,7 +153,7 @@ export class TextUI {
     else if (ndreams == "0") {
       const userInput = document.getElementById('userInput') as HTMLInputElement;
       const lastWord = userInput.value;
-      var s = this.isOriginal ? 'No dreams found talking about ' : 'Ningún sueño habla de '
+      var s =  'No dreams found talking about '
       text!.textContent = s;
 
       text!.setAttribute('data-last-word', lastWord);
@@ -188,7 +161,7 @@ export class TextUI {
     }
     const userInput = document.getElementById('userInput') as HTMLInputElement;
     const lastWord = userInput.value;
-    var s = this.isOriginal ? ndreams + ' dreams are talking about ' : ndreams + ' sueños hablan de '
+    var s =  ndreams + ' dreams are talking about '
     text!.textContent = s;
     text!.setAttribute('data-last-word', lastWord);
   }

@@ -1,6 +1,6 @@
-.main{
-    width:100%;
-    height:100%;
+.main {
+    width: 100%;
+    height: 100%;
     position: absolute;
     fill-opacity: 0%;
     pointer-events: none;
@@ -21,33 +21,80 @@
 }
 
 #dreamCard {
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.9);
     padding: 20px;
     border: 1px solid white;
     width: 60vh;
     height: 60vh;
     position: relative;
-    left: 0vh;
-    color:white;
-    font-family: 'MartianMonoLight';
+    left: -10%;
+    color: white;
+    font-family: 'MartianMonoThin';
     box-sizing: border-box;
-    overflow: hidden; /* Prevent content overflow */
-    
-    #card-exit{
-        position: absolute; 
-        top: 20px; 
-        right: 30px; 
-        cursor: pointer; 
-        pointer-events:all !important;
+    overflow: hidden;
+    /* Prevent content overflow */
+
+    #card-exit {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        cursor: pointer;
+        pointer-events: all !important;
         border-width: 3px solid white;
         padding: 0px;
-        
+
     }
 
+    .card-header {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        margin-left: 2.5%;
+        margin-bottom: 2.5%;
+        margin-top: 2.5%;
+
+        h1 {
+            font-size: 16px;
+            font-family: 'MartianMonoBold';
+            color: black;
+            background-color: white;
+            display: inline-block;
+            line-height: 1.2;
+        }
+    
+        h2 {
+            font-size: 14px;
+            font-family: 'MartianMonoThin';
+            color: rgb(175, 175, 175)
+    
+        }
+
+    }
+
+    .card-header h1,
+    .card-header h2 {
+        margin: 0;
+        padding: 0;
+        display: inline;
+    }
+
+    .card-header h2::before {
+        content: "   | ";
+        margin-left: 20px;
+    }
+
+        
+    p {
+        font-size: 12px;
+        line-height: 1.6;
+        font-family: 'MartianMonoThin';
+        color: rgb(175, 175, 175)
+
+    }
 }
 
-.clickable{
-    pointer-events:all !important;
+.clickable {
+    pointer-events: all !important;
 }
 
 .unselectable {
@@ -60,42 +107,31 @@
 }
 
 ::-webkit-scrollbar {
-  width: 5px;
+    width: 5px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: rgba(30, 30, 30, 0.8); 
+    background: rgba(30, 30, 30, 0.8);
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: white; 
+    background: white;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(144, 122, 207); 
+    background: rgb(144, 122, 207);
 }
 
 .dream-card .content {
-    height: calc(80%); /* Adjust according to the height of the .details section */
-    overflow-y: auto; /* Make the content scrollable if it exceeds the container height */
-    padding: 2.5%; /* Optional, to avoid scrollbar overlap on text */
-}
-
-.dream-card h1 {
-    padding: 2.5%;
-    font-size: 20px;
-    font-family: 'MartianMonoBold';
-
-}
-
-.dream-card p {
-    font-size: 12px;
-    line-height: 1.6;
-    font-family: 'MartianMonoThin';
-
+    height: calc(80%);
+    /* Adjust according to the height of the .details section */
+    overflow-y: auto;
+    /* Make the content scrollable if it exceeds the container height */
+    padding: 3%;
+    /* Optional, to avoid scrollbar overlap on text */
 }
 
 .dream-card .details {
@@ -111,6 +147,17 @@
 }
 
 .highlight {
-    color: #3498db;
+    color: #727acf;
+    font-family: 'MartianMonoBold';
 }
 
+#lineSVG {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+
+    stroke: white;
+    stroke-width: 1;
+
+}

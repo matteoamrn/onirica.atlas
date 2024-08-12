@@ -17,8 +17,8 @@ export class DreamManager {
 
   async searchDreams(word: string): Promise<number[]> {
     const indices: number[] = [];
+    const regex = new RegExp(`(^|[^\\p{L}\\p{N}])${this.sanitizeString(word)}($|[^\\p{L}\\p{N}])`, 'u');
     this.dreams.forEach((dream, index) => {
-      const regex = new RegExp(`(^|[^\\p{L}\\p{N}])${this.sanitizeString(word)}($|[^\\p{L}\\p{N}])`, 'u');
       if (regex.test(this.sanitizeString(dream.getReport()))) {
         indices.push(index);
       }

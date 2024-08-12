@@ -3,20 +3,20 @@ import { CameraManager } from "../CameraManager";
 import { DreamManager } from "../DreamManager";
 import { Sheet } from "./Sheet";
 import gsap from 'gsap'
-import { TextUI } from "./Text";
+import { InfoUI } from "./InfoUI";
 import { SceneManager } from "../SceneManager";
 
 export class UIManager {
 	private engine: Engine;
 	private dreamManager: DreamManager;
 	private sheet: Sheet
-	private textUI: TextUI
+	private infoUI: InfoUI
 	private cameraManager: CameraManager;
 	public queryString: string = '';
 
 	constructor(engine: Engine, dreamManager: DreamManager, cameraManager: CameraManager, sceneManager: SceneManager) {
 		this.engine = engine;
-		this.textUI = new TextUI()
+		this.infoUI = new InfoUI()
 		this.dreamManager = dreamManager;
 		this.cameraManager = cameraManager;
 		this.sheet = new Sheet();
@@ -57,7 +57,7 @@ export class UIManager {
 		search.addEventListener('click', () => {
 			this.queryDreams();
 			document.getElementById('keyboardContainer')?.classList.add('hidden');
-			this.textUI.showButtons()
+			this.infoUI.showButtons()
 		});
 	}
 
@@ -87,24 +87,24 @@ export class UIManager {
 			if (inputElement) inputElement.value = '';
 			this.resetQuery();
 			document.getElementById('keyboardContainer')?.classList.add('hidden');
-			this.textUI.hideButtons()
+			this.infoUI.hideButtons()
 		});
 	}
 
 	queryDreams() {
 		const field = document.getElementById('userInput') as HTMLInputElement;
-
 		if (field.value == "" || field.value == " ") {
 			this.resetQuery()
 			return
 		}
+		this.queryString = field.value
 
-		this.dreamManager.searchDreams(field.value).then((ids: number[]) => {
-			if (ids.length == 0) this.textUI.updateDreamCounter("-1")
+		this.dreamManager.searchDreams(this.queryString).then((ids: number[]) => {
+			if (ids.length == 0) this.infoUI.updateDreamCounter("0")
 			else {
 				this.cameraManager.setQueriedIds(ids)
-				this.onDreamSelection(ids[0])
-				this.textUI.updateDreamCounter(ids.length.toString())
+				this.onDreamSelection(ids[0],)
+				this.infoUI.updateDreamCounter(ids.length.toString())
 			}
 
 		})
@@ -134,21 +134,21 @@ export class UIManager {
 
 	public resetQuery() {
 		this.queryString = '';
-		this.cameraManager.setQueriedIds([]);
+		this.cameraManager.setQueriedIds([])
+		this.engine.camera.reset();
+		this.sheet.hide();
 	}
 
 	private onDreamSelection(dreamId: number) {
 		const dream = this.dreamManager.getDream(dreamId)
 		if (dream){
 			this.cameraManager.onDreamSelection(dreamId);
-			this.sheet.updateText(dream.dreamReport, dreamId);
+			if (this.queryString) this.sheet.updateText(dream.dreamReport, dreamId, dream.db, this.queryString)
+			else this.sheet.updateText(dream.dreamReport, dreamId, dream.db,);
 			gsap.to(this.sheet.container.style, {
 				opacity: 1,
 				ease: "expo.in",
 				duration: 3,
-			// 	onUpdate: () => {
-			// 		this.sheet.cssObject.lookAt(this.engine.camera.instance.position)           
-			// }		
 			})
 		}
 
