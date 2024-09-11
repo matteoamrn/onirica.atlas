@@ -30,7 +30,11 @@ export class Sheet {
             <p>I had to prepare the car, I needed to put suitcases in it, some luggage, they were suitcases, some packages, everything was quite confusing. It was me, and there were two of my friends (who took an exam with me today). These packages had the shape of human body organs. It was a road near a pine forest. We didn't talk, just loaded these strange packages.</p>
             </div>
         </div>
-   `)
+   `)/*
+   		<div id="imageCard" class="image-card">
+		</div>
+
+   */
 		this.container.style.pointerEvents = 'none'
 		document.body.prepend(this.container)
 
@@ -39,30 +43,33 @@ export class Sheet {
 		//    this.svg.id = 'lineSVG'
 		//    this.line1 = document.createElementNS("http://www.w3.org/2000/svg", "line")
 		//    this.line2 = document.createElementNS("http://www.w3.org/2000/svg", "line")
+
+		//    this.svg.style.opacity = "0";
 		//    this.svg.appendChild(this.line1)
 		//    this.svg.appendChild(this.line2)
 		//    document.body.prepend(this.svg)
 
 		//    const rect = document.getElementById("dreamCard")?.getBoundingClientRect()
-		//    if (rect){
+		//    const rect2 = document.getElementById("imageCard")?.getBoundingClientRect()
+
+		//    if (rect && rect2){
 		//     var x1 = rect.right
 		//     var y1 = rect.top
-		//     var y2 = rect.bottom
-		//     var x2 = x1 + 250 // adjust this value to set the distance of the lines
-		//     var y3 = (y1 + y2) / 2 - 90
+		//     var x2 = rect2.left + rect2.width*0.5
+		//     var y2 = rect2.top
 
 
 		//     this.line1.setAttribute("x1", x1.toString())
 		//     this.line1.setAttribute("y1", y1.toString())
 		//     this.line1.setAttribute("x2", x2.toString())
-		//     this.line1.setAttribute("y2", y3.toString())
+		//     this.line1.setAttribute("y2", y2.toString())
 
 		//     y1 = rect.bottom
-		//     y3 += 130
+		//     y2 = rect2.bottom
 		//     this.line2.setAttribute("x1", x1.toString())
 		//     this.line2.setAttribute("y1", y1.toString())
 		//     this.line2.setAttribute("x2", x2.toString())
-		//     this.line2.setAttribute("y2", y3.toString())
+		//     this.line2.setAttribute("y2", y2.toString())
 		//    }
 
 
@@ -78,6 +85,12 @@ export class Sheet {
 			duration: 0.5,
 			ease: "power2.inOut"
 		})
+		// gsap.to(this.svg, {
+		// 	opacity: 0,
+		// 	duration: 0.5,
+		// 	ease: "power2.inOut"
+		// })
+
 	}
 
 

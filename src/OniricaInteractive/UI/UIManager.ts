@@ -133,6 +133,7 @@ export class UIManager {
 	}
 
 	public resetQuery() {
+
 		this.queryString = '';
 		this.cameraManager.setQueriedIds([])
 		this.engine.camera.reset();

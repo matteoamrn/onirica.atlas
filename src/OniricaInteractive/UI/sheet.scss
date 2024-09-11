@@ -40,7 +40,7 @@
         right: 30px;
         cursor: pointer;
         pointer-events: all !important;
-        border-width: 3px solid white;
+        border-width: 3px solid rgb(175,175,175);
         padding: 0px;
 
     }
@@ -157,7 +157,24 @@
     height: 100%;
     pointer-events: none;
 
-    stroke: white;
+    stroke:rgb(175,175,175);
     stroke-width: 1;
+
+}
+
+
+#imageCard{
+        background-color: rgba(0, 0, 0, 1);
+        padding: 20px;
+        border: 1px solid rgb(175,175,175);
+        
+        width: 15vh;
+        height: 15vh;
+        left:3%;
+        position: relative;
+        color: white;
+        font-family: 'MartianMonoThin';
+        box-sizing: border-box;
+        overflow: hidden;
 
 }

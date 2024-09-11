@@ -55,10 +55,16 @@ export class Camera implements GameEntity {
   }
 
   animateTo(target_position:THREE.Vector3) {
-    const new_camera_dir = this.instance.position.clone().sub(target_position).normalize().multiplyScalar(0.25)
-    const pos = target_position.clone().add(new_camera_dir)
+    const new_camera_dir = this.instance.position.clone().sub(target_position).normalize()
+    var camera_pos = target_position.clone().add(new_camera_dir.multiplyScalar(0.35))
 
-    this.controls.setLookAt(pos.x, pos.y, pos.z, target_position.x, target_position.y, target_position.z, true)
+    // let right = new THREE.Vector3();
+    // right.crossVectors(this.engine.camera.instance.up, new_camera_dir.normalize()).normalize();
+
+    // var t = target_position.clone().addScaledVector(right, -0.08);
+    this.controls.setLookAt(camera_pos.x, camera_pos.y, camera_pos.z, target_position.x, target_position.y, target_position.z, true)
+    this.controls.truck(-0.08, 0, true);
+
 
 }
 

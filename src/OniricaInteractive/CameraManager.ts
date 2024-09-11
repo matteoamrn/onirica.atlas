@@ -52,12 +52,7 @@ export class CameraManager {
       const dreamPos = this.dreamManager.getDream(instanceId)!.position;
 
       if (dreamPos) {
-        const distance = 0.06;
-        const XVector = new THREE.Vector3(0.0, -1.0, 0.0);
-        const perpendicularVector = new THREE.Vector3().crossVectors(this.cameraDir, XVector).normalize();
-        const finalPos = dreamPos.clone().addScaledVector(perpendicularVector, distance);
-        
-        this.engine.camera.animateTo(finalPos);
+        this.engine.camera.animateTo(dreamPos)
         this.engine.camera.update();
       }
     }
