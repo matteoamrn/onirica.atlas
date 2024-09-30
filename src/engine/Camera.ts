@@ -5,7 +5,7 @@ import { GameEntity } from './GameEntity'
 import CameraControls from 'camera-controls';
 
 
-CameraControls.install( { THREE: THREE } );
+CameraControls.install({ THREE: THREE });
 const clock = new THREE.Clock()
 
 export class Camera implements GameEntity {
@@ -14,7 +14,8 @@ export class Camera implements GameEntity {
 
   private initPos = new THREE.Vector3(2, 5, 13);
   private cameraWorldDir: THREE.Vector3 = new THREE.Vector3(0)
-  public enableAutorotate:boolean = true;
+  public enableAutorotate: boolean = true;
+  public firstTime: boolean = true
 
   constructor(private engine: Engine) {
     this.initCamera()
@@ -35,13 +36,13 @@ export class Camera implements GameEntity {
 
   private initControls() {
     this.controls = new CameraControls(this.instance, this.engine.canvas)
-    // this.controls.minDistance = 0.2;
+    this.controls.minDistance = 0.2;
 
-    this.controls.maxDistance = 15;
+    this.controls.maxDistance = 1005;
     this.controls.smoothTime = 1.9
     this.controls.dollyToCursor = true
     this.controls.dollySpeed = 0.7
-    // this.controls.infinityDolly = true
+    this.controls.infinityDolly = true
     // this.controls.zoomToCursor = true
     // this.controls.screenSpacePanning = true
     // this.controls.dampingFactor = 25
@@ -54,19 +55,30 @@ export class Camera implements GameEntity {
     this.instance.updateProjectionMatrix()
   }
 
-  animateTo(target_position:THREE.Vector3) {
-    const new_camera_dir = this.instance.position.clone().sub(target_position).normalize()
-    var camera_pos = target_position.clone().add(new_camera_dir.multiplyScalar(0.35))
+  animateTo(target_position: THREE.Vector3) {
+    this.lock();
+    //find camera direction
+    const new_camera_dir = this.instance.position.clone().sub(target_position).normalize();
 
-    // let right = new THREE.Vector3();
-    // right.crossVectors(this.engine.camera.instance.up, new_camera_dir.normalize()).normalize();
+    //find new camera position along the vector going from target to actual camera pos at a fixed distance
+    const camera_pos = target_position.clone().add(new_camera_dir.multiplyScalar(0.35));
 
-    // var t = target_position.clone().addScaledVector(right, -0.08);
-    this.controls.setLookAt(camera_pos.x, camera_pos.y, camera_pos.z, target_position.x, target_position.y, target_position.z, true)
-    this.controls.truck(-0.08, 0, true);
+    //find the right vector perpendicular to the camera dir and the up vector
+    const right = new THREE.Vector3();
+    right.crossVectors(this.instance.up, new_camera_dir).normalize();
 
+    //add offset to the right only first time when orbit point and target are not the same
+    const target_with_offset = target_position.clone().addScaledVector(right, this.firstTime ? -0.08 : 0.00);
+    this.controls.setPosition(camera_pos.x, camera_pos.y, camera_pos.z, true)
+    this.controls.setTarget(target_with_offset.x, target_with_offset.y, target_with_offset.z, true).then(() => {
+      this.controls.setOrbitPoint(target_position.x, target_position.y, target_position.z);
+      this.unlock();
 
-}
+    });
+
+    if (this.firstTime) this.firstTime = false
+
+  }
 
 
   update() {
@@ -75,28 +87,28 @@ export class Camera implements GameEntity {
 
     this.controls.camera.getWorldDirection(this.cameraWorldDir)
 
-    if(this.enableAutorotate){
+    if (this.enableAutorotate) {
       this.controls.azimuthAngle += 3. * delta * THREE.MathUtils.DEG2RAD;
 
     }
-    if (this.controls.distance < 0.2) {
-      var new_target = this.instance.position.clone().add(this.cameraWorldDir.normalize().multiplyScalar(0.2))
-      this.controls.setTarget(new_target.x, new_target.y, new_target.z)
-    }
+    // if (this.controls.distance < 0.2) {
+    //   var new_target = this.instance.position.clone().add(this.cameraWorldDir.normalize().multiplyScalar(0.3))
+    //   this.controls.setOrbitPoint(new_target.x, new_target.y, new_target.z)
+    // }
 
 
 
-}
+  }
 
   reset() {
-    this.controls.setLookAt( this.initPos.x, this.initPos.y, this.initPos.z, 0, 0, 0, true)
-}
+    this.controls.setLookAt(this.initPos.x, this.initPos.y, this.initPos.z, 0, 0, 0, true)
+  }
 
-  lock(){
+  lock() {
     this.controls.enabled = false
   }
 
-  unlock(){
+  unlock() {
     this.controls.enabled = true
   }
 
