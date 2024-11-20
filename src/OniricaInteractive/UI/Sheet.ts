@@ -20,8 +20,20 @@ export class Sheet {
 		this.container.insertAdjacentHTML(
 			'beforeend',
 			`
-        <div id="dreamCard" class="dream-card">
-            <i id="card-exit" class="fas fa-times" ></i>
+
+		<div class="container">
+		<div id="button-previous" class="button-prev side-btn hidden"> 
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 512 512">
+			<polygon class="st0" points="89.3 257 449.9 48.8 449.9 465.2 89.3 257"/>
+		</svg>   
+		</div>
+	     <div id="dreamCard" class="dream-card">
+		<div id="card-exit">
+		<svg viewBox="0 0 384 512">
+		  <rect class='rect' x="165" y="11" width="54" height="490" transform="translate(146.7 572.8) rotate(-135)"/>
+		  <rect class='rect' x="165" y="11" width="54" height="490" transform="translate(508.8 301.3) rotate(135)"/>
+		</svg>		
+		</div>
 			<div id="card-header" class="card-header">
 			<h1>Dream no. 748 | NotREM (ST4: deep sleep)</h1> 
 			<h2>Dreambank: Bo</h2>
@@ -30,6 +42,13 @@ export class Sheet {
             <p>I had to prepare the car, I needed to put suitcases in it, some luggage, they were suitcases, some packages, everything was quite confusing. It was me, and there were two of my friends (who took an exam with me today). These packages had the shape of human body organs. It was a road near a pine forest. We didn't talk, just loaded these strange packages.</p>
             </div>
         </div>
+		<div id="button-next" class="button-prev side-btn hidden"> 
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 512 512">
+			<polygon class="st0" points="48.8 48.8 409.4 257 48.8 465.2 48.8 48.8" fill="currentColor"/>
+			</div>
+
+		</div>
+
    `)/*
    		<div id="imageCard" class="image-card">
 		</div>

@@ -1,7 +1,6 @@
 import './info.scss'
 import Keyboard from 'simple-keyboard';
 import 'simple-keyboard/build/css/index.css';
-import layout from "simple-keyboard-layouts/build/layouts/spanish";
 
 export type TextConfig = {
   title?: string
@@ -37,9 +36,12 @@ export class InfoUI {
           <i class="fa-solid fa-magnifying-glass"></i>
         </div>
         <input id="userInput" class="input" inputmode='none' role="presentation" autocomplete="off" >
-        <div id="crossIcon" class='cross-icon'>
-          <i class="fa-solid fa-x"></i>
-        </div>
+        <div class='cross-icon'>
+        <svg id="crossIcon" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 384 512">
+          <rect x="165" y="11" width="54" height="490" transform="translate(146.7 572.8) rotate(-135)"  fill="currentColor" stroke="currentColor" />
+          <rect x="165" y="11" width="54" height="490" transform="translate(508.8 301.3) rotate(135)"  fill="currentColor" stroke="currentColor"/>
+        </svg>
+      </div>
       `
     );
 
@@ -70,27 +72,33 @@ export class InfoUI {
     buttonContainer.classList.add('button-container');
 
     // Creazione dei pulsanti
-    const buttonPrevious = document.createElement('button');
-    buttonPrevious.id = 'button-previous';
-    buttonPrevious.classList.add('button-prev', 'btn', 'hidden');
-    buttonPrevious.textContent = '<';
-
-    const buttonNext = document.createElement('button');
-    buttonNext.id = 'button-next';
-    buttonNext.classList.add('button-next', 'btn', 'hidden');
-    buttonNext.textContent = '>';
-
-    document.body.appendChild(buttonPrevious);
-    document.body.appendChild(buttonNext);
 
     this.keyboard = new Keyboard({
       theme: "hg-theme-default blackTheme",
-      ...layout,
-      excludeFromLayout: {
-        default: ["@", ".com"],
-        shift: ["@", ".com"]
+      layout: {
+        default: [
+          "1 2 3 4 5 6 7 8 9 0 {bksp}",
+          "q w e r t y u i o p",
+          "{lock} a s d f g h j k l {enter}",
+          "{shift} z x c v b n m {space}",
+        ],
+        shift: [
+          "! @ # $ % ^ & * ( ) _ + {bksp}",
+          "{tab} Q W E R T Y U I O P { } |",
+          '{lock} A S D F G H J K L : " {enter}',
+          "{shift} Z X C V B N M < > ? {shift}",
+          ".com @ {space}"
+        ]
       },
-      onChange: input => {
+      display:
+      {
+        "{bksp}": "del",
+        "{enter}": "search",
+        "{space}": "space",
+        "{lock}": "caps",
+        "{shift}": "shift"
+      },
+       onChange: input => {
         const inputElement = document.getElementById("userInput") as HTMLInputElement;
         inputElement.value = input
 

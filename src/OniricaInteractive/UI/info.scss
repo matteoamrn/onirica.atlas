@@ -71,11 +71,14 @@
     align-items: center;
     width: 10%;
     height: 40px;
-  
-    > i {
-      font-size: 14px;
-  
-    }}
+
+    > svg {
+      width: 14px;
+    
+      fill:white!important;
+    
+    }
+   }
 
 .input {
   width: 80%;
@@ -135,24 +138,6 @@
   top: 0;
 }
 
-.button-next {
-  position: fixed;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  display: flex;
-  justify-content: space-between;
-}
-
-.button-prev {
-  position: fixed;
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
-  display: flex;
-  justify-content: space-between;
-}
-
 
 .btn {
   outline: 0;
@@ -173,9 +158,7 @@
 
 .simple-keyboard.blackTheme {
   background-color: rgba(0, 0, 0, 0.8);
-  border-radius: 0;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
+  border-radius: 0px;
 }
 
 .simple-keyboard.blackTheme .hg-button {
@@ -185,4 +168,10 @@
   align-items: center;
   background: rgba(0, 0, 0, 0.5);
   color: rgb(175, 175, 175);
+  border-radius: 0px;
 }
+
+.simple-keyboard.hg-layout-default .hg-button.hg-highlight {
+  font-size:500px;
+}
+

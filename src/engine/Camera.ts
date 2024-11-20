@@ -7,6 +7,7 @@ import CameraControls from 'camera-controls';
 
 CameraControls.install({ THREE: THREE });
 const clock = new THREE.Clock()
+const camera_offset= 0.35;
 
 export class Camera implements GameEntity {
   public instance!: THREE.PerspectiveCamera
@@ -61,7 +62,7 @@ export class Camera implements GameEntity {
     const new_camera_dir = this.instance.position.clone().sub(target_position).normalize();
 
     //find new camera position along the vector going from target to actual camera pos at a fixed distance
-    const camera_pos = target_position.clone().add(new_camera_dir.multiplyScalar(0.35));
+    const camera_pos = target_position.clone().add(new_camera_dir.multiplyScalar(camera_offset));
 
     //find the right vector perpendicular to the camera dir and the up vector
     const right = new THREE.Vector3();

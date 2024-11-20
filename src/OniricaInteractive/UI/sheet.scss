@@ -15,7 +15,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     position: absolute;
     fill-opacity: 0%;
 }
@@ -23,11 +22,11 @@
 #dreamCard {
     background-color: rgba(0, 0, 0, 0.9);
     padding: 20px;
+    margin:15px;
     border: 1px solid white;
     width: 60vh;
     height: 60vh;
     position: relative;
-    left: -10%;
     color: white;
     font-family: 'MartianMonoThin';
     box-sizing: border-box;
@@ -35,14 +34,26 @@
     /* Prevent content overflow */
 
     #card-exit {
-        position: absolute;
-        top: 20px;
-        right: 30px;
+        position:absolute;
+        right:2.5%;
+        margin-right: 2.5%;
+        margin-bottom: 2.5%;
+        margin-top: 2.5%;
         cursor: pointer;
         pointer-events: all !important;
-        border-width: 3px solid rgb(175,175,175);
-        padding: 0px;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 20px;
+        height: 20px;
+        fill-opacity: 100% !important;
+        > svg {
+             fill: white !important;
 
+        }
+    
+    
     }
 
     .card-header {
@@ -177,4 +188,30 @@
         box-sizing: border-box;
         overflow: hidden;
 
+}
+
+
+.side-btn {
+    position:relative;
+    border: none;
+    color: rgb(175, 175, 175);
+    font-family: 'MartianMonoLight';
+    padding: 10px 15px;
+    cursor: pointer;
+    pointer-events: all !important;
+    top: 50%;
+    transform: translateY(50%);
+    z-index: 1011111; /* Ensure buttons are above the card */
+    width:20px;
+    height:20px;
+
+    > svg {
+        stroke: white !important;
+        stroke-width:20px;
+    }
+}
+
+
+.side-button:hover {
+    background-color: #5a5fb4; /* Slightly darker color on hover */
 }
