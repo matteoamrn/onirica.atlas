@@ -15,7 +15,7 @@ void main() {
     vec4 finalColor = vec4(distance_col, 1.0) * vec4(vColor, 1.0) * texColor;
     
     // // Alpha test threshold
-    if (finalColor.a < 0.1) discard;
+    if (finalColor.a == 0.0) discard;
 
     gl_FragColor = finalColor;
 }

@@ -151,6 +151,12 @@ export class UIManager {
 				ease: "expo.in",
 				duration: 3,
 			})
+			gsap.to(this.sheet.svg, {
+				opacity: 1,
+				ease: "expo.in",
+				duration: 3,
+				})
+		
 		}
 
 	}

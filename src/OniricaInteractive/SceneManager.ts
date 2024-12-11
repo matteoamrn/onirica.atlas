@@ -75,6 +75,8 @@ export class SceneManager {
       fragmentShader: fragmentShader,
       blending: THREE.NormalBlending,
       transparent: true,
+      depthTest: false,
+
     });
 
     this.points = new THREE.Points(geometry, this.material);
