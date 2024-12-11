@@ -66,14 +66,14 @@
         margin-top: 2.5%;
 
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-family: 'MartianMonoBold';
             color: black;
             background-color: white;
             display: inline-block;
             line-height: 1.2;
             @media (max-width: 2400px) {
-                  font-size: 1.2rem; /* Slightly smaller for narrower screens or zoomed viewports */
+                  font-size: 1.0rem; /* Slightly smaller for narrower screens or zoomed viewports */
               }
               @media (max-width: 1200px) {
                   font-size: 0.8rem;
@@ -81,7 +81,7 @@
         }
     
         h2 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-family: 'MartianMonoThin';
             color: rgb(175, 175, 175);
             @media (max-width: 2400px) {
@@ -109,13 +109,13 @@
 
         
     p {
-        font-size: 1.1em;
+        font-size: 1.0em;
         line-height: 1.6;
         font-family: 'MartianMonoThin';
         color: rgb(175, 175, 175);
 
         @media (max-width: 2400px) {
-            font-size: 0.9rem; /* Slightly smaller for narrower screens or zoomed viewports */
+            font-size: 0.9rem; 
         }
         @media (max-width: 120px) {
             font-size: 0.6rem;

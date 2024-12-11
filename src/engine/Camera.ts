@@ -7,7 +7,6 @@ import CameraControls from 'camera-controls';
 
 CameraControls.install({ THREE: THREE });
 const clock = new THREE.Clock()
-const camera_offset= 0.35;
 
 export class Camera implements GameEntity {
   public instance!: THREE.PerspectiveCamera
@@ -16,6 +15,7 @@ export class Camera implements GameEntity {
   private initPos = new THREE.Vector3(2, 5, 13);
   private cameraWorldDir: THREE.Vector3 = new THREE.Vector3(0)
   public enableAutorotate: boolean = true;
+  public firstTime: boolean = true
 
   constructor(private engine: Engine) {
     this.initCamera()
@@ -37,7 +37,6 @@ export class Camera implements GameEntity {
   private initControls() {
     this.controls = new CameraControls(this.instance, this.engine.canvas)
     this.controls.minDistance = 0.2;
-
     this.controls.maxDistance = 1005;
     this.controls.smoothTime = 1.9
     this.controls.dollyToCursor = true
@@ -46,7 +45,7 @@ export class Camera implements GameEntity {
     // this.controls.zoomToCursor = true
     // this.controls.screenSpacePanning = true
     // this.controls.dampingFactor = 25
-      this.controls.minZoom = 2
+    // this.controls.wMax = 20
 
   }
 
@@ -61,16 +60,22 @@ export class Camera implements GameEntity {
     const new_camera_dir = this.instance.position.clone().sub(target_position).normalize();
 
     //find new camera position along the vector going from target to actual camera pos at a fixed distance
-    const camera_pos = target_position.clone().add(new_camera_dir.multiplyScalar(camera_offset));
+    const camera_pos = target_position.clone().add(new_camera_dir.multiplyScalar(0.35));
 
     //find the right vector perpendicular to the camera dir and the up vector
     const right = new THREE.Vector3();
     right.crossVectors(this.instance.up, new_camera_dir).normalize();
-    this.lock();
-    this.controls.setLookAt(camera_pos.x, camera_pos.y, camera_pos.z, target_position.x, target_position.y, target_position.z, true).then( () =>{
+
+    //add offset to the right only first time when orbit point and target are not the same
+    const target_with_offset = target_position.clone().addScaledVector(right, this.firstTime ? -0.08 : 0.00);
+    this.controls.setPosition(camera_pos.x, camera_pos.y, camera_pos.z, true)
+    this.controls.setTarget(target_with_offset.x, target_with_offset.y, target_with_offset.z, true).then(() => {
+      this.controls.setOrbitPoint(target_position.x, target_position.y, target_position.z);
       this.unlock();
+
     });
 
+    if (this.firstTime) this.firstTime = false
 
   }
 
@@ -95,7 +100,7 @@ export class Camera implements GameEntity {
   }
 
   reset() {
-    this.controls.setLookAt(this.initPos.x, this.initPos.y, this.initPos.z, 0 , 0 , 0, true)
+    this.controls.setLookAt(this.initPos.x, this.initPos.y, this.initPos.z, 0, 0, 0, true)
   }
 
   lock() {
