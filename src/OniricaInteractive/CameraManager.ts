@@ -18,7 +18,7 @@ export class CameraManager {
   private selectedId: number;
   private highlightedIds: number[];
   private queriedIds: number[] = [];
-  private nneighbors = 8
+  private nneighbors = 16
   private _currentQuery:string = ''
   private sceneManager: SceneManager;
 

@@ -21,7 +21,7 @@
 }
 
 #dreamCard {
-    background-color: rgba(0, 0, 0, 1);
+    background-color: rgba(0, 0, 0, 0.95);
     padding: 20px;
     margin:15px;
     border: 1px solid white;
@@ -32,7 +32,6 @@
     font-family: 'MartianMonoThin';
     box-sizing: border-box;
     overflow: hidden;
-    /* Prevent content overflow */
 
     #card-exit {
         position:absolute;
@@ -75,7 +74,7 @@
             @media (max-width: 2400px) {
                   font-size: 1.0rem; /* Slightly smaller for narrower screens or zoomed viewports */
               }
-              @media (max-width: 1200px) {
+              @media (max-width: 1600px) {
                   font-size: 0.8rem;
               }
         }
@@ -87,7 +86,7 @@
             @media (max-width: 2400px) {
                 font-size: 1.1rem; /* Slightly smaller for narrower screens or zoomed viewports */
             }
-            @media (max-width: 1200px) {
+            @media (max-width: 1600px) {
                 font-size: 0.8rem;
             }
 
@@ -109,7 +108,7 @@
 
         
     p {
-        font-size: 1.0em;
+        font-size: 0.8rem;
         line-height: 1.6;
         font-family: 'MartianMonoThin';
         color: rgb(175, 175, 175);
@@ -120,8 +119,6 @@
         @media (max-width: 120px) {
             font-size: 0.6rem;
         }
-
-
     }
 }
 
@@ -227,7 +224,7 @@
     pointer-events: all !important;
     top: 50%;
     transform: translateY(50%);
-    z-index: 1011111; /* Ensure buttons are above the card */
+    z-index: 100; /* Ensure buttons are above the card */
     width:20px;
     height:20px;
 

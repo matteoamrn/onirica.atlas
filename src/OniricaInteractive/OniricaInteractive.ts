@@ -27,8 +27,8 @@ export class OniricaInteractive implements Experience {
 		this.parseCSV()
 			.then((dreams : Map<number, Dream>) => {
 				this.dreamManager = new DreamManager(dreams); //store dream data structure
-				this.sceneManager = new SceneManager(this.engine, dreams, 8); //create 3d scene
-				this.cameraManager = new CameraManager(this.engine, this.dreamManager,this.sceneManager, 0.5); //manage camera movements and update of state
+				this.sceneManager = new SceneManager(this.engine, dreams, 16); //create 3d scene
+				this.cameraManager = new CameraManager(this.engine, this.dreamManager,this.sceneManager, 0.7); //manage camera movements and update of state
 				this.uiManager = new UIManager(this.engine, this.dreamManager, this.cameraManager, this.sceneManager); //manage UI elements and interactions
 
 				this.sceneManager.createScene();

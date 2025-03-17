@@ -10,7 +10,7 @@ void main() {
     vec4 texColor = texture2D(pointTexture, gl_PointCoord);
     vec4 finalColor = vec4(distance_col, 1.0) * vec4(vColor, 1.0) * texColor;
     
-    if (finalColor.a == 0.0) discard;
+    if (finalColor.a < 0.1) discard;
 
     gl_FragColor = finalColor;
 }

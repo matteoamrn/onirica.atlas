@@ -108,10 +108,7 @@ export class UIManager {
 			}
 
 		})
-
 	}
-
-
 	private navigateToNextDream() {
 		const queriedIds = this.cameraManager._queriedIds;
 		if (queriedIds.length > 0) {
@@ -133,10 +130,8 @@ export class UIManager {
 	}
 
 	public resetQuery() {
-
 		this.queryString = '';
 		this.cameraManager.setQueriedIds([])
-		this.engine.camera.reset();
 		this.sheet.hide();
 	}
 

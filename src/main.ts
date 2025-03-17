@@ -1,4 +1,4 @@
-import './style.scss'
+import './style.css'
 import { Engine } from './engine/Engine'
 import { OniricaInteractive } from './OniricaInteractive/OniricaInteractive'
 
