@@ -8,9 +8,9 @@
     justify-content: center;
     align-items: center;
     opacity: 0;
-
+ 
 }
-
+ 
 .container {
     display: flex;
     justify-content: center;
@@ -19,9 +19,9 @@
     fill-opacity: 0%;
     top:12.5%;
 }
-
+ 
 #dreamCard {
-    background-color: rgba(0, 0, 0, 0.95);
+    background-color: rgba(0, 0, 0, 1);
     padding: 20px;
     margin:15px;
     border: 1px solid white;
@@ -32,30 +32,27 @@
     font-family: 'MartianMonoThin';
     box-sizing: border-box;
     overflow: hidden;
-
+    /* Prevent content overflow */
+ 
     #card-exit {
         position:absolute;
-        right:2.5%;
-        margin-right: 2.5%;
-        margin-bottom: 2.5%;
-        margin-top: 2.5%;
+        top: 2.5%;
+        right: 2.5%;
+        color: white !important;
         cursor: pointer;
         pointer-events: all !important;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 20px;
-        height: 20px;
+
+        width: 1rem;
+        height: 1rem;
         fill-opacity: 100% !important;
         > svg {
-             fill: white !important;
-
+            fill-opacity: 100%;
+             fill: white;
         }
     
     
     }
-
+ 
     .card-header {
         display: flex;
         justify-content: left;
@@ -63,7 +60,7 @@
         margin-left: 2.5%;
         margin-bottom: 2.5%;
         margin-top: 2.5%;
-
+ 
         h1 {
             font-size: 1.2rem;
             font-family: 'MartianMonoBold';
@@ -74,7 +71,7 @@
             @media (max-width: 2400px) {
                   font-size: 1.0rem; /* Slightly smaller for narrower screens or zoomed viewports */
               }
-              @media (max-width: 1600px) {
+              @media (max-width: 1200px) {
                   font-size: 0.8rem;
               }
         }
@@ -86,46 +83,48 @@
             @media (max-width: 2400px) {
                 font-size: 1.1rem; /* Slightly smaller for narrower screens or zoomed viewports */
             }
-            @media (max-width: 1600px) {
+            @media (max-width: 1200px) {
                 font-size: 0.8rem;
             }
-
+ 
         }
-
+ 
     }
-
+ 
     .card-header h1,
     .card-header h2 {
         margin: 0;
         padding: 0;
         display: inline;
     }
-
+ 
     .card-header h2::before {
         content: "   | ";
         margin-left: 20px;
     }
-
+ 
         
     p {
-        font-size: 0.8rem;
+        font-size: 1.0em;
         line-height: 1.6;
         font-family: 'MartianMonoThin';
         color: rgb(175, 175, 175);
-
+ 
         @media (max-width: 2400px) {
             font-size: 0.9rem; 
         }
         @media (max-width: 120px) {
             font-size: 0.6rem;
         }
+ 
+ 
     }
 }
-
+ 
 .clickable {
     pointer-events: all !important;
 }
-
+ 
 .unselectable {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -134,26 +133,26 @@
     -ms-user-select: none;
     user-select: none;
 }
-
+ 
 ::-webkit-scrollbar {
     width: 5px;
 }
-
+ 
 /* Track */
 ::-webkit-scrollbar-track {
     background: rgba(30, 30, 30, 0.8);
 }
-
+ 
 /* Handle */
 ::-webkit-scrollbar-thumb {
     background: white;
 }
-
+ 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: rgb(144, 122, 207);
 }
-
+ 
 .dream-card .content {
     height: calc(80%);
     /* Adjust according to the height of the .details section */
@@ -162,36 +161,36 @@
     padding: 3%;
     /* Optional, to avoid scrollbar overlap on text */
 }
-
+ 
 .dream-card .details {
     display: flex;
     flex-wrap: wrap;
     margin-top: 15px;
 }
-
+ 
 .detail {
     width: 50%;
     margin-bottom: 5px;
     font-size: 12px;
 }
-
+ 
 .highlight {
     color: #727acf;
     font-family: 'MartianMonoBold';
 }
-
+ 
 #lineSVG {
     position: absolute;
     width: 100%;
     height: 100%;
     pointer-events: none;
-
+ 
     stroke:rgb(175,175,175);
     stroke-width: 1;
-
+ 
 }
-
-
+ 
+ 
 #imageCard{
         background-color: rgba(0, 0, 0, 1);
         border: 1px solid rgb(175,175,175);
@@ -204,7 +203,7 @@
         font-family: 'MartianMonoThin';
         box-sizing: border-box;
         overflow: hidden;
-
+ 
         img{
             width: 100%;
             height: 100%;
@@ -212,8 +211,8 @@
         }
       
 }
-
-
+ 
+ 
 .side-btn {
     position:relative;
     border: none;
@@ -224,17 +223,17 @@
     pointer-events: all !important;
     top: 50%;
     transform: translateY(50%);
-    z-index: 100; /* Ensure buttons are above the card */
+    z-index: 1011111; /* Ensure buttons are above the card */
     width:20px;
     height:20px;
-
+ 
     > svg {
         stroke: white !important;
         stroke-width:30px;
     }
 }
-
-
+ 
+ 
 .side-button:hover {
     background-color: #5a5fb4; /* Slightly darker color on hover */
 }

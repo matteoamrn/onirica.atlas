@@ -29,7 +29,6 @@
     "postprocessing": "^6.34.2",
     "simple-keyboard": "^3.7.58",
     "simple-keyboard-layouts": "^3.3.102",
-    "tailwind": "^4.0.0",
     "tailwindcss": "^4.0.14",
     "three": "^0.157.0",
     "troika-three-text": "^0.49.0",
