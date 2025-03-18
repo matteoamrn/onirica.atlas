@@ -118,8 +118,8 @@ export class Sheet {
  
  
 	updateText(text: string, dreamId: number, dreambank:string, highlightWord?: string) {
-		this.container.querySelector('h1')!.textContent = "Dream no. " + String(dreamId);
-		const dreambank_string = dreambank == 'Bo' ? 'University of Bologna' : 'UC Santa Cruz'  
+		this.container.querySelector('h1')!.textContent = "Dream n. " + String(dreamId);
+		const dreambank_string = dreambank == 'Bo' ? 'Univ. of Bologna' : 'UC Santa Cruz'  
 		this.container.querySelector('h2')!.textContent = "Dreambank: " + dreambank_string;
  
 		const paragraph = this.container.querySelector('p')!;

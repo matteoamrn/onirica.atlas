@@ -67,7 +67,7 @@ export class InfoUI {
     `<div class="simple-keyboard"></div>`
    document.body.appendChild(key)
 
-    // Creazione della div per i pulsanti
+    // Creazione del div per i pulsanti
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('button-container');
 
@@ -196,7 +196,6 @@ export class InfoUI {
     buttonNext?.classList.add('hidden');
     const infoBar = document.getElementById('dreamCount');
     infoBar?.classList.add('hidden');
-
   }
 
 

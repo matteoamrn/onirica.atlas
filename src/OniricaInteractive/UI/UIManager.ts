@@ -131,6 +131,9 @@ export class UIManager {
 
 	public resetQuery() {
 		this.queryString = '';
+		this.infoUI.resetKeyboard()
+		const field = document.getElementById('userInput') as HTMLInputElement;
+		field.value = ""
 		this.cameraManager.setQueriedIds([])
 		this.sheet.hide();
 	}
