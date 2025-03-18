@@ -4,7 +4,6 @@ import { DreamManager } from "../DreamManager";
 import { Sheet } from "./Sheet";
 import gsap from 'gsap'
 import { InfoUI } from "./InfoUI";
-import { SceneManager } from "../SceneManager";
 
 export class UIManager {
 	private engine: Engine;
@@ -14,7 +13,7 @@ export class UIManager {
 	private cameraManager: CameraManager;
 	public queryString: string = '';
 
-	constructor(engine: Engine, dreamManager: DreamManager, cameraManager: CameraManager, sceneManager: SceneManager) {
+	constructor(engine: Engine, dreamManager: DreamManager, cameraManager: CameraManager) {
 		this.engine = engine;
 		this.infoUI = new InfoUI()
 		this.dreamManager = dreamManager;

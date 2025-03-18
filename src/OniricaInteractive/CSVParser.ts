@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import Papa from 'papaparse';
 import { Dream } from './Dream';
 
