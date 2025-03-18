@@ -3,7 +3,7 @@
 This scaffolding lets you easily get started with using Three.js and TypeScript.
 
 ## Prerequisites
-
+ 
 - [Node.js](https://nodejs.org)
 - [yarn](https://yarnpkg.com) OR [npm](https://www.npmjs.com)
 
